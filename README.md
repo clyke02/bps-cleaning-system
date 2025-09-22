@@ -252,13 +252,202 @@ git rebase origin/main
 
 ---
 
+## Setup Laravel Backend (bps-cleaning-system)
+
+### Struktur Project
+
+```
+bps_cleaning_system/
+├── lib/                    # Flutter app
+├── android/               # Android config
+├── ios/                   # iOS config
+├── web/                   # Web config
+├── backend/               # Laravel API (backend)
+│   ├── app/
+│   ├── config/
+│   ├── database/
+│   ├── routes/
+│   └── .env
+└── README.md
+```
+
+### Lokasi Backend
+
+Backend Laravel sekarang berada di: `backend/` (subfolder dalam project Flutter)
+
+### Setup Database MySQL
+
+1. **Pastikan MySQL berjalan** di port 3306
+2. **Database sudah dibuat** dengan nama `bps_cleaning` (sesuai spesifikasi)
+3. **File .env Laravel** berada di `backend/.env`
+
+### Konfigurasi .env Laravel
+
+File `.env` berada di folder `backend/.env`. Jika tidak ada, buat dengan isi:
+
+```env
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:1zun7pk+LTkIbv8yxf4GKczP9v4CokVpSa7JTFIQj2I=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bps_cleaning
+DB_USERNAME=root
+DB_PASSWORD=
+
+# ... (konfigurasi lainnya tetap default)
+```
+
+### Menjalankan Migration & Seeder
+
+```bash
+# Dari root project (bps_cleaning_system/)
+cd backend
+
+# Jalankan migration
+php artisan migrate
+
+# Insert data user manual (karena seeder bermasalah)
+# Gunakan MySQL client atau phpMyAdmin untuk menjalankan:
+INSERT INTO users (name, email, password, role, created_at, updated_at) VALUES
+('Admin 01', 'admin01@example.com', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NOW(), NOW()),
+('User 01', 'user01@example.com', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user', NOW(), NOW());
+```
+
+**Password untuk kedua akun: `secret`** (hash di atas adalah untuk password 'secret')
+
+### Menjalankan Laravel Server
+
+```bash
+# Dari root project (bps_cleaning_system/)
+cd backend
+php artisan serve
+```
+
+Server akan berjalan di `http://localhost:8000`
+
+### API Endpoints
+
+- **POST** `/api/login` - Login dengan email & password
+- **POST** `/api/logout` - Logout (dengan Bearer token)
+- **GET** `/api/user` - Get user info (dengan Bearer token)
+
+### Testing API
+
+Gunakan Postman atau curl untuk test:
+
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin01@example.com","password":"secret"}'
+```
+
+### Akun Test
+
+- **Admin**: `admin01@example.com` / `admin01`
+- **User**: `user01@example.com` / `user01`
+
+---
+
+## 🚀 Menjalankan Full Project
+
+### Development Workflow
+
+1. **Jalankan Backend (Laravel) terlebih dahulu:**
+
+```bash
+# Terminal 1 - Backend
+cd backend
+php artisan serve
+# Laravel akan berjalan di http://localhost:8000
+```
+
+2. **Jalankan Frontend (Flutter):**
+
+```bash
+# Terminal 2 - Frontend (dari root project)
+flutter pub get
+flutter run
+# Pilih device (Android emulator, iOS simulator, Chrome, dll)
+```
+
+### Setup Project untuk Worker Baru
+
+```bash
+# Clone project
+git clone <your-repo-url>
+cd bps_cleaning_system
+
+# Setup backend
+cd backend
+composer install
+cp .env.example .env  # Edit database config sesuai README
+php artisan key:generate
+php artisan migrate
+php artisan db:seed --class=UserSeeder
+
+# Setup frontend
+cd ..  # kembali ke root
+flutter pub get
+
+# Jalankan development
+# Terminal 1: cd backend && php artisan serve
+# Terminal 2: flutter run
+```
+
+### Project Structure untuk Git
+
+```
+bps_cleaning_system/          # Root repo (ini yang di-push ke GitHub)
+├── lib/                      # Flutter source code
+├── android/                  # Android platform files
+├── ios/                      # iOS platform files
+├── web/                      # Web platform files
+├── backend/                  # Laravel API
+│   ├── app/                  # Laravel app logic
+│   ├── config/               # Laravel config
+│   ├── database/             # Migrations, seeders
+│   ├── routes/               # API routes
+│   ├── .env                  # Laravel environment (JANGAN commit!)
+│   ├── .gitignore           # Backend specific gitignore
+│   └── vendor/               # Laravel dependencies (JANGAN commit!)
+├── pubspec.yaml              # Flutter dependencies
+├── .gitignore                # Main gitignore
+└── README.md                 # Dokumentasi ini
+```
+
+### ✅ Status Backend (Sudah Diperbaiki)
+
+- ✅ **Struktur**: Backend sudah dipindahkan ke `backend/` subfolder
+- ✅ **API Routes**: Sudah terdaftar dan berfungsi (`/api/login`, `/api/logout`, `/api/user`)
+- ✅ **Database**: Migration dan seeder sudah berjalan
+- ✅ **Encoding**: File PHP sudah diperbaiki dari masalah encoding
+- ✅ **Dependencies**: Laravel Sanctum sudah terinstall dan dikonfigurasi
+- ✅ **User Data**: Admin dan User test sudah berhasil dibuat
+
+### Testing Lengkap
+
+1. **Backend API**: `http://localhost:8000/api/login`
+2. **Frontend Flutter**: Login dengan akun test
+3. **Integration**: Flutter → Laravel → MySQL
+
+---
+
 ## Troubleshooting
 
 - Jalankan `flutter clean && flutter pub get` jika terjadi error build aneh.
 - Periksa `flutter doctor` untuk dependensi yang hilang.
 - Pada Windows, pastikan PowerShell memiliki izin eksekusi bila skrip diperlukan.
+- **Laravel**: Pastikan MySQL service berjalan dan database `bps_cleaning` sudah dibuat.
+- **Laravel**: Jika migration gagal, periksa koneksi database di file `.env`.
 
 ## Referensi
 
 - Dokumentasi Flutter: `https://docs.flutter.dev/`
 - Dart Packages: `https://pub.dev/`
+- Laravel Documentation: `https://laravel.com/docs`
+- Laravel Sanctum: `https://laravel.com/docs/sanctum`
