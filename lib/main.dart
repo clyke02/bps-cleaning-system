@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/auth/login_page.dart';
 import 'screens/admin/admin_dashboard.dart';
 import 'screens/user/user_dashboard.dart';
+import 'screens/admin/staff_management/staff_dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/admin': (context) => const AdminDashboardPage(),
         '/user': (context) => const UserDashboard(),
+        '/admin/staff_management': (context) => const StaffDashboard(),
       },
     );
   }

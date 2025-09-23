@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'staff_management/staff_dashboard.dart';
+import 'area_management/area_dashboard.dart';
+import 'admin_navbar.dart';
+import 'settings/settings_dashboard.dart';
 
-class AdminDashboardPage extends StatelessWidget {
+class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
 
   @override
+  State<AdminDashboardPage> createState() => _AdminDashboardPageState();
+}
+
+class _AdminDashboardPageState extends State<AdminDashboardPage> {
+  int tabIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
-    // 🔹 Dummy data laporan
     final List<Map<String, dynamic>> reportData = [
       {
         "title": "Ruang Pengolahan Data",
@@ -31,190 +41,163 @@ class AdminDashboardPage extends StatelessWidget {
       },
     ];
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF53F383), Color(0xFF0080FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: Row(
-            children: [
-              Image.asset(
-                "assets/logo.png", // ✅ logo dari assets
-                height: 40,
-              ),
-            ],
-          ),
-          actions: [
-            Row(
-              children: [
-                const Icon(Icons.account_circle,
-                    color: Colors.black, size: 28), // ✅ ikon profil
-                const SizedBox(width: 6),
-                const Text(
-                  "Bambang",
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          // ---------- Ringkasan Minggu Ini ----------
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 5,
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    side: const BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: const Text("Keluar"),
-                ),
-                const SizedBox(width: 8),
               ],
-            )
-          ],
-        ),
-        body: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // ---------- Ringkasan Minggu Ini ----------
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 5)
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          "Ringkasan Minggu ini",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        "Ringkasan Minggu ini",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          "12 Tugas",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      _SummaryItem(
-                          color: Colors.orange, value: "2", label: "Dikerjakan"),
-                      _SummaryItem(
-                          color: Colors.green, value: "7", label: "Selesai"),
-                      _SummaryItem(
-                          color: Colors.red, value: "3", label: "Pending"),
-                    ],
-                  )
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ---------- Tab Menu ----------
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                children: const [
-                  Expanded(child: _TabButton(title: "Laporan", isActive: true)),
-                  Expanded(child: _TabButton(title: "Petugas")),
-                  Expanded(child: _TabButton(title: "Area")),
-                  Expanded(child: _TabButton(title: "Pengaturan")),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ---------- Container Laporan Kebersihan ----------
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 5)
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Laporan Kebersihan",
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: "Cari Ruangan",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 0),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 🔹 Daftar ReportCard pakai ListView.builder
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: reportData.length,
-                    itemBuilder: (context, index) {
-                      final report = reportData[index];
-                      return _ReportCard(
-                        title: report["title"],
-                        status: report["status"],
-                        statusColor: report["statusColor"],
-                        petugas: report["petugas"],
-                        tanggal: report["tanggal"],
-                        catatanPetugas: report["catatanPetugas"],
-                        catatanAdmin: report["catatanAdmin"],
-                        isApproved: report["isApproved"],
-                        imagePath: report["imagePath"],
-                      );
-                    },
-                  ),
-                ],
-              ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        "12 Tugas",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    _SummaryItem(
+                        color: Colors.orange, value: "2", label: "Dikerjakan"),
+                    _SummaryItem(
+                        color: Colors.green, value: "7", label: "Selesai"),
+                    _SummaryItem(
+                        color: Colors.red, value: "3", label: "Pending"),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // ---------- Navbar ----------
+          AdminNavbar(
+            currentIndex: tabIndex,
+            onTabSelected: (index) => setState(() => tabIndex = index),
+          ),
+
+          const SizedBox(height: 16),
+
+          // ---------- Tab Content ----------
+          Expanded(
+            child: Builder(
+              builder: (context) {
+                if (tabIndex == 0) {
+                  // Laporan Tab
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Laporan Kebersihan",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search),
+                            hintText: "Cari Ruangan",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 0,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: reportData.length,
+                            itemBuilder: (context, index) {
+                              final report = reportData[index];
+                              return _ReportCard(
+                                title: report["title"],
+                                status: report["status"],
+                                statusColor: report["statusColor"],
+                                petugas: report["petugas"],
+                                tanggal: report["tanggal"],
+                                catatanPetugas: report["catatanPetugas"],
+                                catatanAdmin: report["catatanAdmin"],
+                                isApproved: report["isApproved"],
+                                imagePath: report["imagePath"],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (tabIndex == 1) {
+                  return const StaffDashboard();
+                } else if (tabIndex == 2) {
+                  return const AreaDashboard();
+                } else if (tabIndex == 3) {
+                  return SettingsDashboard(); // ✅ tanpa const
+                } else {
+                  return const Center(
+                    child: Text('Tab belum diimplementasi'),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -228,42 +211,27 @@ class _SummaryItem extends StatelessWidget {
   final String value;
   final String label;
 
-  const _SummaryItem(
-      {required this.color, required this.value, required this.label});
+  const _SummaryItem({
+    required this.color,
+    required this.value,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value,
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
-    );
-  }
-}
-
-class _TabButton extends StatelessWidget {
-  final String title;
-  final bool isActive;
-  const _TabButton({required this.title, this.isActive = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.grey.shade200 : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(title,
-            style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: isActive ? Colors.black : Colors.grey)),
-      ),
     );
   }
 }
@@ -350,8 +318,7 @@ class _ReportCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                       ),
-                      child:
-                          const Text("Detail", style: TextStyle(fontSize: 12)),
+                      child: const Text("Detail", style: TextStyle(fontSize: 12)),
                     )
                   ],
                 ),
@@ -360,11 +327,11 @@ class _ReportCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // ---------- Body (foto + catatan) ----------
+            // ---------- Body ----------
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Foto responsif + klik bisa zoom
+                // Foto
                 Container(
                   height: 120,
                   width: screenWidth * 0.35,
@@ -376,30 +343,7 @@ class _ReportCard extends StatelessWidget {
                   child: imagePath != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => Dialog(
-                                  backgroundColor: Colors.black,
-                                  insetPadding: EdgeInsets.zero,
-                                  child: InteractiveViewer(
-                                    panEnabled: true,
-                                    minScale: 0.5,
-                                    maxScale: 4,
-                                    child: Image.network(
-                                      imagePath!,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Image.network(
-                              imagePath!,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                          child: Image.network(imagePath!, fit: BoxFit.cover),
                         )
                       : const Center(
                           child: Icon(Icons.camera_alt,
@@ -409,7 +353,7 @@ class _ReportCard extends StatelessWidget {
 
                 const SizedBox(width: 12),
 
-                // Catatan di kanan
+                // Catatan
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,7 +367,6 @@ class _ReportCard extends StatelessWidget {
                       ],
                       const SizedBox(height: 12),
 
-                      // ✅ Tombol Setujui / Tolak sejajar
                       if (!isApproved) ...[
                         Row(
                           children: [
@@ -433,19 +376,8 @@ class _ReportCard extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
                                 ),
-                                child: const Text(
-                                  "Setujui",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                child: const Text("Setujui"),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -455,19 +387,8 @@ class _ReportCard extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
                                 ),
-                                child: const Text(
-                                  "Tolak",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                child: const Text("Tolak"),
                               ),
                             ),
                           ],
@@ -477,15 +398,12 @@ class _ReportCard extends StatelessWidget {
 
                       ElevatedButton.icon(
                         onPressed: () {},
-                        icon:
-                            const Icon(Icons.chat_bubble_outline, size: 16),
+                        icon: const Icon(Icons.chat_bubble_outline, size: 16),
                         label: const Text("Beri Catatan"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
                           side: const BorderSide(color: Colors.black12),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
                         ),
                       ),
                     ],
