@@ -12,23 +12,19 @@ class AdminNavbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
+      height: 60,
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-          ),
-        ],
+        borderRadius: BorderRadius.zero,
+        boxShadow: [],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildTab(context, 0, "Laporan", Icons.assignment),
-          _buildTab(context, 1, "Petugas", Icons.people),
-          _buildTab(context, 2, "Area", Icons.map),
-          _buildTab(context, 3, "Pengaturan", Icons.settings),
+          _buildTab(context, 0, "Laporan", Icons.assignment_outlined),
+          _buildTab(context, 1, "Petugas", Icons.people_outline),
+          _buildTab(context, 2, "Area", Icons.location_on_outlined),
+          _buildTab(context, 3, "Pengaturan", Icons.settings_outlined),
         ],
       ),
     );
@@ -37,29 +33,26 @@ class AdminNavbar extends StatelessWidget {
   Widget _buildTab(BuildContext context, int index, String title, IconData icon) {
     final bool isActive = index == currentIndex;
     return Expanded(
-      child: GestureDetector(
+      child: InkWell(
         onTap: () => onTabSelected(index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isActive ? Colors.grey.shade200 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: isActive ? Colors.blue : Colors.grey, size: 22),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: isActive ? Colors.black : Colors.grey,
-                  fontSize: 13,
-                ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? Colors.black : Colors.grey,
+              size: 26,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                color: isActive ? Colors.black : Colors.grey,
+                fontSize: 13,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
