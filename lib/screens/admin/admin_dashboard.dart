@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'staff_dashboard.dart';
 import 'area_dashboard.dart';
@@ -26,7 +25,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       "catatanPetugas": "Pembersihan rutin pagi hari",
       "catatanAdmin": "Pekerjaan baik, area bersih",
       "isApproved": true,
-      "imagePath": null, 
+      "imagePath": null,
     },
     {
       "title": "Toilet",
@@ -55,21 +54,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     });
   }
 
-  void _onNavBarTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushReplacementNamed(context, '/admin');
-    } else if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/admin/staff');
-    } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/admin/area');
-    } else if (index == 3) {
-      Navigator.pushReplacementNamed(context, '/admin/settings');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +62,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header mirip staff_dashboard
+            // HEADER
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               width: double.infinity,
@@ -107,10 +91,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 10),
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             'BPS Sukabumi',
                             style: TextStyle(
@@ -170,7 +154,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               ),
                             ),
                             const SizedBox(width: 6),
-                            Flexible(
+                            const Flexible(
                               child: Text(
                                 'Bambang',
                                 overflow: TextOverflow.ellipsis,
@@ -215,20 +199,25 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ],
               ),
             ),
-            // Konten utama scrollable
+
+            // KONTEN UTAMA
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
+                  // 🔹 Background disamakan dengan staff_dashboard
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFF4ADE80), Color(0xFF2196F3)],
+                    colors: [
+                      Color(0xFF2196F3), // biru
+                      Color(0xFF4ADE80), // hijau muda
+                    ],
                   ),
                 ),
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    // Ringkasan Minggu Ini (identik staff_dashboard)
+                    // RINGKASAN MINGGU INI
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.only(top: 24, bottom: 32),
@@ -280,79 +269,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               const SizedBox(height: 18),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  // Menunggu
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "2",
-                                          style: TextStyle(
-                                            color: Color(0xFFF39C12),
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          "menunggu",
-                                          style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Selesai
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "7",
-                                          style: TextStyle(
-                                            color: Color(0xFF388E3C),
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          "Selesai",
-                                          style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Tidak Setuju
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "3",
-                                          style: TextStyle(
-                                            color: Color(0xFFD32F2F),
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          "tidak setuju",
-                                          style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                children: const [
+                                  _SummaryItem(count: "2", label: "menunggu", color: Color(0xFFF39C12)),
+                                  _SummaryItem(count: "7", label: "Selesai", color: Color(0xFF388E3C)),
+                                  _SummaryItem(count: "3", label: "tidak setuju", color: Color(0xFFD32F2F)),
                                 ],
                               ),
                             ],
@@ -360,7 +280,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         ),
                       ),
                     ),
-                    // Section Title & Search (tanpa card putih, sesuai gambar)
+
+                    // SEARCH DAN LIST LAPORAN
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       child: Column(
@@ -381,7 +302,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               fontSize: 13,
                               color: Colors.white,
                               fontWeight: FontWeight.w400,
-                              shadows: [Shadow(color: Colors.black26, blurRadius: 2, offset: Offset(0,1))],
+                              shadows: [Shadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1))],
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -424,7 +345,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         ],
                       ),
                     ),
-                    // Card Laporan
+
+                    // CARD LAPORAN
                     ...reportData.where((r) {
                       final query = _searchQuery.toLowerCase();
                       final title = r["title"].toString().toLowerCase();
@@ -458,6 +380,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ],
         ),
       ),
+
+      // NAVBAR
       bottomNavigationBar: AdminNavbar(
         currentIndex: _selectedIndex,
         onTabSelected: (index) {
@@ -465,25 +389,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             _selectedIndex = index;
           });
           if (index == 0) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminDashboardPage()));
           } else if (index == 1) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const StaffDashboardPage()),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const StaffDashboardPage()));
           } else if (index == 2) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AreaDashboardPage()),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AreaDashboardPage()));
           } else if (index == 3) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsDashboardPage()),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SettingsDashboardPage()));
           }
         },
       ),
@@ -491,6 +403,28 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 }
 
+// ========== RINGKASAN ITEM ==========
+class _SummaryItem extends StatelessWidget {
+  final String count;
+  final String label;
+  final Color color;
+  const _SummaryItem({required this.count, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(count, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 20)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(color: Colors.black54, fontSize: 14, fontStyle: FontStyle.italic)),
+        ],
+      ),
+    );
+  }
+}
+
+// ========== REPORT CARD ==========
 class _ReportCard extends StatelessWidget {
   final int index;
   final String title;
@@ -551,7 +485,7 @@ class _ReportCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // header
+          // HEADER
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
@@ -561,7 +495,10 @@ class _ReportCard extends StatelessWidget {
             Row(children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Text(status, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
               const SizedBox(width: 8),
@@ -574,9 +511,9 @@ class _ReportCard extends StatelessWidget {
           ]),
           const SizedBox(height: 12),
 
-          // body
+          // BODY
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Gambar lebih besar di kiri
+            // GAMBAR
             Container(
               width: 130,
               height: 100,
@@ -611,13 +548,14 @@ class _ReportCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.grey.shade100,
                   ),
-          child: (imagePath?.isNotEmpty == true)
-            ? ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(imagePath!, fit: BoxFit.cover))
-            : const Center(child: Icon(Icons.camera_alt, size: 32, color: Colors.grey)),
+                  child: (imagePath?.isNotEmpty == true)
+                      ? ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(imagePath!, fit: BoxFit.cover))
+                      : const Center(child: Icon(Icons.camera_alt, size: 32, color: Colors.grey)),
                 ),
               ),
             ),
             const SizedBox(width: 12),
+            // CATATAN
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,8 +586,7 @@ class _ReportCard extends StatelessWidget {
                       icon: const Icon(Icons.chat_bubble_outline, size: 16),
                       label: const Text("Beri Catatan"),
                     ),
-                  ]
-                  else ...[
+                  ] else ...[
                     const SizedBox(height: 8),
                     OutlinedButton.icon(
                       onPressed: () => _beriCatatan(context),
@@ -663,7 +600,7 @@ class _ReportCard extends StatelessWidget {
           ]),
           const SizedBox(height: 12),
 
-          // action row
+          // DOWNLOAD
           Row(
             children: [
               const Spacer(),

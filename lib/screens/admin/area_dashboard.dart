@@ -70,10 +70,10 @@ class _AreaDashboardPageState extends State<AreaDashboardPage> {
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 10),
-                          Column(
+                          const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               Text(
                                 'BPS Sukabumi',
                                 style: TextStyle(
@@ -157,7 +157,9 @@ class _AreaDashboardPageState extends State<AreaDashboardPage> {
                           ),
                           const SizedBox(width: 4),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(context, '/login');
+                            },
                             style: TextButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.black,
@@ -231,79 +233,10 @@ class _AreaDashboardPageState extends State<AreaDashboardPage> {
                           const SizedBox(height: 18),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              // Menunggu
-                              Expanded(
-                                child: Column(
-                                  children: const [
-                                    Text(
-                                      "2",
-                                      style: TextStyle(
-                                        color: Color(0xFFF39C12),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      "menunggu",
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Selesai
-                              Expanded(
-                                child: Column(
-                                  children: const [
-                                    Text(
-                                      "7",
-                                      style: TextStyle(
-                                        color: Color(0xFF388E3C),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      "Selesai",
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Tidak Setuju
-                              Expanded(
-                                child: Column(
-                                  children: const [
-                                    Text(
-                                      "3",
-                                      style: TextStyle(
-                                        color: Color(0xFFD32F2F),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      "tidak setuju",
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            children: const [
+                              _SummaryItem(count: "2", label: "menunggu", color: Color(0xFFF39C12)),
+                              _SummaryItem(count: "7", label: "Selesai", color: Color(0xFF388E3C)),
+                              _SummaryItem(count: "3", label: "tidak setuju", color: Color(0xFFD32F2F)),
                             ],
                           ),
                         ],
@@ -450,6 +383,27 @@ class _AreaDashboardPageState extends State<AreaDashboardPage> {
             Navigator.pushReplacementNamed(context, '/admin/settings');
           }
         },
+      ),
+    );
+  }
+}
+
+// ========== Widget Ringkasan ==========
+class _SummaryItem extends StatelessWidget {
+  final String count;
+  final String label;
+  final Color color;
+  const _SummaryItem({required this.count, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(count, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 20)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(color: Colors.black54, fontSize: 14, fontStyle: FontStyle.italic)),
+        ],
       ),
     );
   }
