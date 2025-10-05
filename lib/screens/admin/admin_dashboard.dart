@@ -1,274 +1,432 @@
 import 'package:flutter/material.dart';
+import 'staff_dashboard.dart';
+import 'area_dashboard.dart';
+import 'settings_dashboard.dart';
+import 'admin_navbar.dart';
 
-class AdminDashboardPage extends StatelessWidget {
+class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // 🔹 Dummy data laporan
-    final List<Map<String, dynamic>> reportData = [
-      {
-        "title": "Ruang Pengolahan Data",
-        "status": "Selesai",
-        "statusColor": Colors.green,
-        "petugas": "Budi Santoso",
-        "tanggal": "25-08-2025",
-        "catatanPetugas": "Pembersihan rutin pagi hari",
-        "catatanAdmin": "Pekerjaan baik, area bersih",
-        "isApproved": true,
-        "imagePath": "https://picsum.photos/400/200",
-      },
-      {
-        "title": "Toilet",
-        "status": "Menunggu",
-        "statusColor": Colors.orange,
-        "petugas": "Budi Santoso",
-        "tanggal": "25-08-2025",
-        "catatanPetugas": "Pembersihan rutin pagi hari",
-        "catatanAdmin": null,
-        "isApproved": false,
-        "imagePath": "https://picsum.photos/400/201",
-      },
-    ];
+  State<AdminDashboardPage> createState() => _AdminDashboardPageState();
+}
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF53F383), Color(0xFF0080FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: Row(
-            children: [
-              Image.asset(
-                "assets/logo.png", // ✅ logo dari assets
-                height: 40,
-              ),
-            ],
-          ),
-          actions: [
-            Row(
-              children: [
-                const Icon(Icons.account_circle,
-                    color: Colors.black, size: 28), // ✅ ikon profil
-                const SizedBox(width: 6),
-                const Text(
-                  "Bambang",
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    side: const BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: const Text("Keluar"),
-                ),
-                const SizedBox(width: 8),
-              ],
-            )
-          ],
-        ),
-        body: ListView(
-          padding: const EdgeInsets.all(16),
+class _AdminDashboardPageState extends State<AdminDashboardPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  int _selectedIndex = 0;
+  List<Map<String, dynamic>> reportData = [
+    {
+      "title": "Ruang Pengolahan Data",
+      "status": "Selesai",
+      "statusColor": Colors.green,
+      "petugas": "Budi Santoso",
+      "tanggal": "25-08-2025",
+      "catatanPetugas": "Pembersihan rutin pagi hari",
+      "catatanAdmin": "Pekerjaan baik, area bersih",
+      "isApproved": true,
+      "imagePath": null,
+    },
+    {
+      "title": "Toilet",
+      "status": "Menunggu",
+      "statusColor": Colors.orange,
+      "petugas": "Siti Aminah",
+      "tanggal": "25-08-2025",
+      "catatanPetugas": "Pembersihan rutin pagi hari",
+      "catatanAdmin": null,
+      "isApproved": false,
+      "imagePath": null,
+    },
+  ];
+
+  void updateStatus(int index, String newStatus, Color newColor, bool isApproved) {
+    setState(() {
+      reportData[index]["status"] = newStatus;
+      reportData[index]["statusColor"] = newColor;
+      reportData[index]["isApproved"] = isApproved;
+    });
+  }
+
+  void updateCatatan(int index, String catatan) {
+    setState(() {
+      reportData[index]["catatanAdmin"] = catatan;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFEFF5F9),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ---------- Ringkasan Minggu Ini ----------
+            // HEADER
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              width: double.infinity,
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 5)
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          "Ringkasan Minggu ini",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          "12 Tugas",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      )
-                    ],
+                    color: Color(0x0D000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      _SummaryItem(
-                          color: Colors.orange, value: "2", label: "Dikerjakan"),
-                      _SummaryItem(
-                          color: Colors.green, value: "7", label: "Selesai"),
-                      _SummaryItem(
-                          color: Colors.red, value: "3", label: "Pending"),
-                    ],
-                  )
                 ],
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ---------- Tab Menu ----------
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(12)),
               child: Row(
-                children: const [
-                  Expanded(child: _TabButton(title: "Laporan", isActive: true)),
-                  Expanded(child: _TabButton(title: "Petugas")),
-                  Expanded(child: _TabButton(title: "Area")),
-                  Expanded(child: _TabButton(title: "Pengaturan")),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Logo dan judul
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 54,
+                        height: 54,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 10),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'BPS Sukabumi',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 20,
+                              color: Colors.black,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Sistem Kebersihan',
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 13,
+                              height: 1.1,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  // Profile dan tombol keluar
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 120),
+                        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.black87, width: 1.3),
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.person_outline, size: 18, color: Colors.black87),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Flexible(
+                              child: Text(
+                                'Bambang',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                  letterSpacing: 0.1,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black12,
+                                      blurRadius: 1,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: const BorderSide(color: Color(0xFFBDBDBD)),
+                          ),
+                          elevation: 1,
+                        ),
+                        child: const Text('Keluar'),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 16),
-
-            // ---------- Container Laporan Kebersihan ----------
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.05), blurRadius: 5)
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Laporan Kebersihan",
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+            // KONTEN UTAMA
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  // 🔹 Background disamakan dengan staff_dashboard
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFF2196F3), // biru
+                      Color(0xFF4ADE80), // hijau muda
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: "Cari Ruangan",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    // RINGKASAN MINGGU INI
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(top: 24, bottom: 32),
+                      child: Center(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.13),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text(
+                                      "Ringkasan Minggu ini",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                        decoration: TextDecoration.underline,
+                                        decorationThickness: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFD32F2F),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Text(
+                                      "12 Tugas",
+                                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: const [
+                                  _SummaryItem(count: "2", label: "menunggu", color: Color(0xFFF39C12)),
+                                  _SummaryItem(count: "7", label: "Selesai", color: Color(0xFF388E3C)),
+                                  _SummaryItem(count: "3", label: "tidak setuju", color: Color(0xFFD32F2F)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 0),
                     ),
-                  ),
-                  const SizedBox(height: 16),
 
-                  // 🔹 Daftar ReportCard pakai ListView.builder
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: reportData.length,
-                    itemBuilder: (context, index) {
-                      final report = reportData[index];
-                      return _ReportCard(
-                        title: report["title"],
-                        status: report["status"],
-                        statusColor: report["statusColor"],
-                        petugas: report["petugas"],
-                        tanggal: report["tanggal"],
-                        catatanPetugas: report["catatanPetugas"],
-                        catatanAdmin: report["catatanAdmin"],
-                        isApproved: report["isApproved"],
-                        imagePath: report["imagePath"],
+                    // SEARCH DAN LIST LAPORAN
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Laporan Kebersihan",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            "Kelola dan pantau laporan dari petugas",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              shadows: [Shadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1))],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.10),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: Icon(Icons.search, color: Colors.grey, size: 22),
+                                ),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _searchQuery = value;
+                                      });
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText: 'Cari Ruangan',
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // CARD LAPORAN
+                    ...reportData.where((r) {
+                      final query = _searchQuery.toLowerCase();
+                      final title = r["title"].toString().toLowerCase();
+                      final petugas = r["petugas"].toString().toLowerCase();
+                      return title.contains(query) || petugas.contains(query);
+                    }).map((r) {
+                      int i = reportData.indexOf(r);
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                        child: _ReportCard(
+                          index: i,
+                          title: r["title"],
+                          status: r["status"],
+                          statusColor: r["statusColor"],
+                          petugas: r["petugas"],
+                          tanggal: r["tanggal"],
+                          catatanPetugas: r["catatanPetugas"],
+                          catatanAdmin: r["catatanAdmin"],
+                          isApproved: r["isApproved"] ?? false,
+                          imagePath: r["imagePath"],
+                          onStatusChange: updateStatus,
+                          onCatatanChange: updateCatatan,
+                        ),
                       );
-                    },
-                  ),
-                ],
+                    }).toList(),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
+
+      // NAVBAR
+      bottomNavigationBar: AdminNavbar(
+        currentIndex: _selectedIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          if (index == 0) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminDashboardPage()));
+          } else if (index == 1) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const StaffDashboardPage()));
+          } else if (index == 2) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AreaDashboardPage()));
+          } else if (index == 3) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SettingsDashboardPage()));
+          }
+        },
+      ),
     );
   }
 }
 
-//
-// ---------- Sub Widget ----------
-//
+// ========== RINGKASAN ITEM ==========
 class _SummaryItem extends StatelessWidget {
-  final Color color;
-  final String value;
+  final String count;
   final String label;
-
-  const _SummaryItem(
-      {required this.color, required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value,
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-}
-
-class _TabButton extends StatelessWidget {
-  final String title;
-  final bool isActive;
-  const _TabButton({required this.title, this.isActive = false});
+  final Color color;
+  const _SummaryItem({required this.count, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.grey.shade200 : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(title,
-            style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: isActive ? Colors.black : Colors.grey)),
+    return Expanded(
+      child: Column(
+        children: [
+          Text(count, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 20)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(color: Colors.black54, fontSize: 14, fontStyle: FontStyle.italic)),
+        ],
       ),
     );
   }
 }
 
+// ========== REPORT CARD ==========
 class _ReportCard extends StatelessWidget {
+  final int index;
   final String title;
   final String status;
   final Color statusColor;
@@ -278,239 +436,183 @@ class _ReportCard extends StatelessWidget {
   final String? catatanAdmin;
   final bool isApproved;
   final String? imagePath;
+  final Function(int, String, Color, bool) onStatusChange;
+  final Function(int, String) onCatatanChange;
 
   const _ReportCard({
+    required this.index,
     required this.title,
     required this.status,
     required this.statusColor,
     required this.petugas,
     required this.tanggal,
     required this.catatanPetugas,
-    this.catatanAdmin,
+    required this.catatanAdmin,
     required this.isApproved,
-    this.imagePath,
+    required this.imagePath,
+    required this.onStatusChange,
+    required this.onCatatanChange,
   });
+
+  void _beriCatatan(BuildContext context) async {
+    final controller = TextEditingController();
+    String? result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Beri Catatan Admin"),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: "Tulis catatan..."),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Batal")),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, controller.text), child: const Text("Simpan")),
+        ],
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      onCatatanChange(index, result);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---------- Header ----------
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
-                      const SizedBox(height: 2),
-                      Text(petugas,
-                          style: const TextStyle(
-                              fontSize: 13, color: Colors.black87)),
-                      const SizedBox(height: 2),
-                      Text(tanggal,
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey)),
-                    ],
-                  ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // HEADER
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              Text(petugas, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+              Text(tanggal, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ]),
+            Row(children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        status,
-                        style: TextStyle(
-                            color: statusColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(0, 32),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                      ),
-                      child:
-                          const Text("Detail", style: TextStyle(fontSize: 12)),
-                    )
-                  ],
-                ),
-              ],
-            ),
+                child: Text(status, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton(
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(minimumSize: const Size(0, 32)),
+                child: const Text("Detail", style: TextStyle(fontSize: 12)),
+              ),
+            ])
+          ]),
+          const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
-
-            // ---------- Body (foto + catatan) ----------
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Foto responsif + klik bisa zoom
-                Container(
-                  height: 120,
-                  width: screenWidth * 0.35,
+          // BODY
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // GAMBAR
+            Container(
+              width: 130,
+              height: 100,
+              child: GestureDetector(
+                onTap: (imagePath?.isNotEmpty == true)
+                    ? () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => Dialog(
+                            backgroundColor: Colors.transparent,
+                            insetPadding: const EdgeInsets.all(16),
+                            child: InteractiveViewer(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.network(
+                                  imagePath!,
+                                  fit: BoxFit.contain,
+                                  width: MediaQuery.of(context).size.width * 0.9,
+                                  height: MediaQuery.of(context).size.height * 0.6,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                child: Container(
+                  height: 100,
+                  width: 130,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.grey.shade100,
                   ),
-                  child: imagePath != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => Dialog(
-                                  backgroundColor: Colors.black,
-                                  insetPadding: EdgeInsets.zero,
-                                  child: InteractiveViewer(
-                                    panEnabled: true,
-                                    minScale: 0.5,
-                                    maxScale: 4,
-                                    child: Image.network(
-                                      imagePath!,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Image.network(
-                              imagePath!,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                      : const Center(
-                          child: Icon(Icons.camera_alt,
-                              size: 40, color: Colors.grey),
-                        ),
+                  child: (imagePath?.isNotEmpty == true)
+                      ? ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(imagePath!, fit: BoxFit.cover))
+                      : const Center(child: Icon(Icons.camera_alt, size: 32, color: Colors.grey)),
                 ),
-
-                const SizedBox(width: 12),
-
-                // Catatan di kanan
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Catatan Petugas: $catatanPetugas",
-                          style: const TextStyle(fontSize: 13)),
-                      if (catatanAdmin != null) ...[
-                        const SizedBox(height: 4),
-                        Text("Catatan Admin: $catatanAdmin",
-                            style: const TextStyle(fontSize: 13)),
-                      ],
-                      const SizedBox(height: 12),
-
-                      // ✅ Tombol Setujui / Tolak sejajar
-                      if (!isApproved) ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
-                                ),
-                                child: const Text(
-                                  "Setujui",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
-                                ),
-                                child: const Text(
-                                  "Tolak",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon:
-                            const Icon(Icons.chat_bubble_outline, size: 16),
-                        label: const Text("Beri Catatan"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          side: const BorderSide(color: Colors.black12),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
+            const SizedBox(width: 12),
+            // CATATAN
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Catatan Petugas: $catatanPetugas", style: const TextStyle(fontSize: 13)),
+                  if (catatanAdmin != null)
+                    Text("Catatan Admin: $catatanAdmin", style: const TextStyle(fontSize: 13)),
+                  if (status == 'Menunggu') ...[
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      ElevatedButton.icon(
+                        onPressed: () => onStatusChange(index, "Selesai", Colors.green, true),
+                        icon: const Icon(Icons.check, size: 14),
+                        label: const Text("Setujui"),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () => onStatusChange(index, "Tidak Setuju", Colors.red, false),
+                        icon: const Icon(Icons.close, size: 14),
+                        label: const Text("Tolak"),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                      ),
+                    ]),
+                    const SizedBox(height: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _beriCatatan(context),
+                      icon: const Icon(Icons.chat_bubble_outline, size: 16),
+                      label: const Text("Beri Catatan"),
+                    ),
+                  ] else ...[
+                    const SizedBox(height: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _beriCatatan(context),
+                      icon: const Icon(Icons.chat_bubble_outline, size: 16),
+                      label: const Text("Beri Catatan"),
+                    ),
+                  ]
+                ],
+              ),
+            )
+          ]),
+          const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
-
-            // ---------- Footer ----------
-            Align(
-              alignment: Alignment.bottomRight,
-              child: ElevatedButton.icon(
+          // DOWNLOAD
+          Row(
+            children: [
+              const Spacer(),
+              ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.download, size: 16),
                 label: const Text("Download Laporan"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
               ),
-            )
-          ],
-        ),
+            ],
+          )
+        ]),
       ),
     );
   }
