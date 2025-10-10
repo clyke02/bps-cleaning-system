@@ -7,10 +7,12 @@ Sweet Alert konfirmasi penghapusan petugas yang muncul saat menekan tombol delet
 ### 🎨 **Design Features:**
 
 1. **Header dengan Warning Icon**
+
    - ✅ Icon warning amber dengan warna merah
    - ✅ Title "Konfirmasi Hapus" dengan styling bold
 
 2. **Content Area**
+
    - ✅ Pertanyaan konfirmasi yang jelas
    - ✅ Preview card petugas yang akan dihapus:
      - Avatar dengan initial nama (background merah)
@@ -44,7 +46,7 @@ AlertDialog(
 
 1. **Trigger**: Tekan icon delete (trash) pada kartu petugas
 2. **Confirmation**: Sweet alert muncul dengan preview petugas
-3. **Options**: 
+3. **Options**:
    - **Batal**: Tutup dialog, tidak ada perubahan
    - **Hapus**: Konfirmasi penghapusan
 4. **Action**: Jika dikonfirmasi, petugas dihapus dari list
@@ -52,26 +54,26 @@ AlertDialog(
 
 ### 🎭 **Visual Elements:**
 
-| Element | Styling |
-|---------|---------|
-| Dialog | Rounded 16px corners |
-| Warning Icon | Amber with red color, size 28 |
-| Staff Preview | Red transparent background with border |
-| Staff Avatar | Red background with white initials |
-| Cancel Button | Grey text, flat style |
-| Delete Button | Red background, white text |
-| SnackBar | Red background, floating with rounded corners |
+| Element       | Styling                                       |
+| ------------- | --------------------------------------------- |
+| Dialog        | Rounded 16px corners                          |
+| Warning Icon  | Amber with red color, size 28                 |
+| Staff Preview | Red transparent background with border        |
+| Staff Avatar  | Red background with white initials            |
+| Cancel Button | Grey text, flat style                         |
+| Delete Button | Red background, white text                    |
+| SnackBar      | Red background, floating with rounded corners |
 
 ### 🔄 **State Management:**
 
 ```dart
 void _handleDeletePetugas(Map<String, String> staff) {
   Navigator.of(context).pop(); // Close dialog
-  
+
   setState(() {
     staffList.removeWhere((s) => s['name'] == staff['name']); // Remove from list
   });
-  
+
   ScaffoldMessenger.showSnackBar(...); // Success feedback
 }
 ```

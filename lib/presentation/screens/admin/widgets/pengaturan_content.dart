@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/ringkasan_widget.dart';
 
 class PengaturanContentWidget extends StatefulWidget {
   final Map<String, int>? weeklySummary;
@@ -30,88 +31,10 @@ class _PengaturanContentWidgetState extends State<PengaturanContentWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Ringkasan Mingguan Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.only(top: 16, bottom: 20),
-              child: Center(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.13),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              "Ringkasan Mingguan",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                color: Colors.black,
-                                decorationThickness: 2,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD32F2F),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              "${widget.weeklySummary?['total'] ?? 12} Tugas",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _SummaryItem(
-                            count: "${widget.weeklySummary?['selesai'] ?? 7}",
-                            label: "Selesai",
-                            color: const Color(0xFF388E3C),
-                          ),
-                          _SummaryItem(
-                            count: "${widget.weeklySummary?['menunggu'] ?? 3}",
-                            label: "Menunggu",
-                            color: const Color(0xFFF39C12),
-                          ),
-                          _SummaryItem(
-                            count: "${widget.weeklySummary?['ditolak'] ?? 2}",
-                            label: "Ditolak",
-                            color: const Color(0xFFD32F2F),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            RingkasanWidget(
+              weeklySummary:
+                  widget.weeklySummary ??
+                  {'total': 12, 'selesai': 7, 'menunggu': 3, 'ditolak': 2},
             ),
 
             // Pengaturan Sistem Section
@@ -325,61 +248,6 @@ class _PengaturanContentWidgetState extends State<PengaturanContentWidget> {
             fontWeight: FontWeight.w500,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SummaryItem extends StatelessWidget {
-  final String count;
-  final String label;
-  final Color color;
-
-  const _SummaryItem({
-    required this.count,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.25), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            count,
-            style: TextStyle(
-              color: color,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              height: 1.0,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              height: 1.0,
-            ),
-          ),
-        ],
       ),
     );
   }
