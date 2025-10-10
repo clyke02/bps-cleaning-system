@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PetugasContentWidget extends StatefulWidget {
   final Map<String, int>? weeklySummary;
-  
+
   const PetugasContentWidget({Key? key, this.weeklySummary}) : super(key: key);
 
   @override
@@ -44,7 +44,10 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
               child: Center(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -68,18 +71,27 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
                                 color: Colors.black,
+                                decoration: TextDecoration.underline,
+                                decorationThickness: 2,
                               ),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFD32F2F),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               "${widget.weeklySummary?['total'] ?? 12} Tugas",
-                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -88,9 +100,21 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _SummaryItem(count: "${widget.weeklySummary?['selesai'] ?? 7}", label: "Selesai", color: const Color(0xFF388E3C)),
-                          _SummaryItem(count: "${widget.weeklySummary?['menunggu'] ?? 3}", label: "Menunggu", color: const Color(0xFFF39C12)),
-                          _SummaryItem(count: "${widget.weeklySummary?['ditolak'] ?? 2}", label: "Ditolak", color: const Color(0xFFD32F2F)),
+                          _SummaryItem(
+                            count: "${widget.weeklySummary?['selesai'] ?? 7}",
+                            label: "Selesai",
+                            color: const Color(0xFF388E3C),
+                          ),
+                          _SummaryItem(
+                            count: "${widget.weeklySummary?['menunggu'] ?? 3}",
+                            label: "Menunggu",
+                            color: const Color(0xFFF39C12),
+                          ),
+                          _SummaryItem(
+                            count: "${widget.weeklySummary?['ditolak'] ?? 2}",
+                            label: "Ditolak",
+                            color: const Color(0xFFD32F2F),
+                          ),
                         ],
                       ),
                     ],
@@ -154,7 +178,9 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                     const SizedBox(height: 16),
 
                     // List Petugas
-                    ...staffList.map((staff) => _buildStaffCard(staff)).toList(),
+                    ...staffList
+                        .map((staff) => _buildStaffCard(staff))
+                        .toList(),
                   ],
                 ),
               ),
@@ -209,7 +235,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Staff Info
           Expanded(
             child: Column(
@@ -225,15 +251,12 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                 const SizedBox(height: 4),
                 Text(
                   staff['phone']!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
           ),
-          
+
           // Edit Button
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -251,7 +274,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
             ),
           ),
           const SizedBox(width: 8),
-          
+
           // Delete Button
           const Icon(Icons.delete_outline, color: Colors.grey),
         ],

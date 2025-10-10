@@ -63,7 +63,8 @@ class Report {
       catatanAdmin: json['catatan_admin'],
       imagePaths: List<String>.from(json['image_paths'] ?? []),
       areaId: json['area_id'] ?? 0,
-      tasks: (json['tasks'] as List<dynamic>?)
+      tasks:
+          (json['tasks'] as List<dynamic>?)
               ?.map((task) => CleaningTask.fromJson(task))
               .toList() ??
           [],
@@ -86,11 +87,7 @@ class Report {
   }
 }
 
-enum ReportStatus {
-  menunggu,
-  selesai,
-  ditolak,
-}
+enum ReportStatus { menunggu, selesai, ditolak }
 
 extension ReportStatusExtension on ReportStatus {
   String get displayName {
@@ -127,11 +124,7 @@ class CleaningTask {
     this.isCompleted = false,
   });
 
-  CleaningTask copyWith({
-    int? id,
-    String? description,
-    bool? isCompleted,
-  }) {
+  CleaningTask copyWith({int? id, String? description, bool? isCompleted}) {
     return CleaningTask(
       id: id ?? this.id,
       description: description ?? this.description,
@@ -148,10 +141,6 @@ class CleaningTask {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'description': description,
-      'is_completed': isCompleted,
-    };
+    return {'id': id, 'description': description, 'is_completed': isCompleted};
   }
 }
