@@ -1,4 +1,4 @@
-import '../../../models/report_model.dart';
+import '../models/report_model.dart';
 
 class SampleReportData {
   static List<Report> reports = [

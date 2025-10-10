@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/report_model.dart';
+import '../../../../data/models/report_model.dart';
 
 class AddCatatanDialog extends StatefulWidget {
   final Report report;

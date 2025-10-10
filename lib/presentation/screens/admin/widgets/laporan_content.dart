@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../models/report_model.dart';
-import '../data/sample_report_data.dart';
+import '../../../../data/models/report_model.dart';
+import '../../../../data/datasources/sample_report_data.dart';
 import 'report_card.dart';
 import 'report_detail_dialog.dart';
 import 'add_catatan_dialog.dart';

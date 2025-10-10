@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/auth/login_page.dart';
-import 'screens/admin/admin_dashboard.dart';
-import 'screens/user/user_dashboard.dart';
+import 'presentation/screens/auth/login_page.dart';
+import 'presentation/screens/admin/admin_dashboard.dart';
+import 'presentation/screens/user/user_dashboard.dart';
 
 void main() {
   runApp(const MyApp());

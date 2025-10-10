@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'admin_navbar.dart';
 import 'widgets/laporan_content.dart';
 import 'widgets/petugas_content.dart';
 import 'widgets/area_content.dart';
 import 'widgets/pengaturan_content.dart';
-import 'data/sample_report_data.dart';
+import '../../../data/datasources/sample_report_data.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -28,13 +27,35 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ],
         ),
       ),
-      bottomNavigationBar: AdminNavbar(
-        currentIndex: _selectedIndex,
-        onTabSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+      bottomNavigationBar: Container(
+        height: 65,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildNavItem(0, Icons.home, 'Home'),
+            ),
+            Expanded(
+              child: _buildNavItem(1, Icons.people, 'Petugas'),
+            ),
+            Expanded(
+              child: _buildNavItem(2, Icons.location_on, 'Area'),
+            ),
+            Expanded(
+              child: _buildNavItem(3, Icons.settings, 'Pengaturan'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -186,6 +207,36 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    final isSelected = _selectedIndex == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? const Color(0xFF4CAF50) : Colors.grey,
+            size: 24,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? const Color(0xFF4CAF50) : Colors.grey,
+              fontSize: 10,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ],
       ),
