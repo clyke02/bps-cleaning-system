@@ -4,10 +4,7 @@ import '../../../../data/models/report_model.dart';
 class AddCatatanDialog extends StatefulWidget {
   final Report report;
 
-  const AddCatatanDialog({
-    super.key,
-    required this.report,
-  });
+  const AddCatatanDialog({super.key, required this.report});
 
   static void show(BuildContext context, Report report) {
     showDialog(
@@ -63,7 +60,7 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
           children: [
             // Header
             _buildHeader(context),
-            
+
             // Content
             Expanded(
               child: Padding(
@@ -74,34 +71,34 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
                     children: [
                       // Info laporan
                       _buildReportInfo(),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Foto Bukti
                       _buildFotoBukti(),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Kebersihan yang dikerjakan
                       _buildTasksList(),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Catatan Petugas
                       _buildCatatanPetugas(),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Penilaian Kualitas Kerja
                       _buildPenilaianKualitas(),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Catatan Admin
                       _buildCatatanAdmin(),
-                      
+
                       const SizedBox(height: 30),
-                      
+
                       // Tombol Simpan
                       _buildSimpanButton(),
                     ],
@@ -119,9 +116,7 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1)),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -140,16 +135,9 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
           ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.close,
-              color: Colors.grey,
-              size: 24,
-            ),
+            icon: const Icon(Icons.close, color: Colors.grey, size: 24),
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 32,
-              minHeight: 32,
-            ),
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
         ],
       ),
@@ -162,10 +150,7 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
       children: [
         Text(
           'Area : Lantai 1 - ${widget.report.title}    ${widget.report.tanggal}',
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
         ),
       ],
     );
@@ -243,52 +228,56 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
           ),
         ),
         const SizedBox(height: 8),
-        ...widget.report.tasks.map((task) => Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: [
-              Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: task.isCompleted 
-                      ? const Color(0xFF4CAF50) 
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: task.isCompleted 
-                        ? const Color(0xFF4CAF50) 
-                        : Colors.grey.shade400,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(4),
+        ...widget.report.tasks
+            .map(
+              (task) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: task.isCompleted
+                            ? const Color(0xFF4CAF50)
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: task.isCompleted
+                              ? const Color(0xFF4CAF50)
+                              : Colors.grey.shade400,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: task.isCompleted
+                          ? const Icon(
+                              Icons.check,
+                              size: 14,
+                              color: Colors.white,
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        task.description,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: task.isCompleted
+                              ? Colors.black87
+                              : Colors.grey.shade600,
+                          decoration: task.isCompleted
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                          decorationColor: Colors.grey.shade500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: task.isCompleted
-                    ? const Icon(
-                        Icons.check,
-                        size: 14,
-                        color: Colors.white,
-                      )
-                    : null,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  task.description,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: task.isCompleted 
-                        ? Colors.black87 
-                        : Colors.grey.shade600,
-                    decoration: task.isCompleted 
-                        ? TextDecoration.lineThrough 
-                        : TextDecoration.none,
-                    decorationColor: Colors.grey.shade500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )).toList(),
+            )
+            .toList(),
       ],
     );
   }
@@ -381,10 +370,7 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
           maxLines: 4,
           decoration: InputDecoration(
             hintText: 'Berikan feedback, saran atau apresiasi',
-            hintStyle: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 12,
-            ),
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 12),
             contentPadding: const EdgeInsets.all(12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -422,16 +408,11 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.black87,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: const Text(
           'Simpan Catatan & Penilaian',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -441,7 +422,7 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
     // TODO: Implement save functionality
     print('Simpan catatan: ${_catatanAdminController.text}');
     print('Rating: $_rating');
-    
+
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -449,7 +430,7 @@ class _AddCatatanDialogState extends State<AddCatatanDialog> {
         backgroundColor: Color(0xFF4CAF50),
       ),
     );
-    
+
     Navigator.of(context).pop();
   }
 }

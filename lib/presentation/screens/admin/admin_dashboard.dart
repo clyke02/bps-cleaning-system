@@ -42,18 +42,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ),
         child: Row(
           children: [
-            Expanded(
-              child: _buildNavItem(0, Icons.home, 'Home'),
-            ),
-            Expanded(
-              child: _buildNavItem(1, Icons.people, 'Petugas'),
-            ),
-            Expanded(
-              child: _buildNavItem(2, Icons.location_on, 'Area'),
-            ),
-            Expanded(
-              child: _buildNavItem(3, Icons.settings, 'Pengaturan'),
-            ),
+            Expanded(child: _buildNavItem(0, Icons.home, 'Home')),
+            Expanded(child: _buildNavItem(1, Icons.people, 'Petugas')),
+            Expanded(child: _buildNavItem(2, Icons.location_on, 'Area')),
+            Expanded(child: _buildNavItem(3, Icons.settings, 'Pengaturan')),
           ],
         ),
       ),
@@ -192,7 +184,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.red.shade50,
-                          border: Border.all(color: Colors.red.shade200, width: 1),
+                          border: Border.all(
+                            color: Colors.red.shade200,
+                            width: 1,
+                          ),
                         ),
                         child: Center(
                           child: Icon(

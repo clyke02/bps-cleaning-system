@@ -2,15 +2,15 @@ class DateTimeHelper {
   static String formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
   }
-  
+
   static String formatDateTime(DateTime dateTime) {
     return '${formatDate(dateTime)} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
-  
+
   static String formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
-  
+
   static DateTime? parseDate(String dateString) {
     try {
       final parts = dateString.split('-');
@@ -26,11 +26,11 @@ class DateTimeHelper {
       return null;
     }
   }
-  
+
   static String getTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays > 365) {
       return '${(difference.inDays / 365).floor()} tahun yang lalu';
     } else if (difference.inDays > 30) {
@@ -45,30 +45,48 @@ class DateTimeHelper {
       return 'Baru saja';
     }
   }
-  
+
   static bool isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
-  
+
   static bool isYesterday(DateTime date) {
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    return date.year == yesterday.year && 
-           date.month == yesterday.month && 
-           date.day == yesterday.day;
+    return date.year == yesterday.year &&
+        date.month == yesterday.month &&
+        date.day == yesterday.day;
   }
-  
+
   static String getIndonesianMonth(int month) {
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     return months[month - 1];
   }
-  
+
   static String getIndonesianDay(int weekday) {
     const days = [
-      'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+      'Minggu',
     ];
     return days[weekday - 1];
   }

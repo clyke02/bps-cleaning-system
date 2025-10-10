@@ -4,10 +4,7 @@ import '../../../../data/models/report_model.dart';
 class ReportDetailDialog extends StatelessWidget {
   final Report report;
 
-  const ReportDetailDialog({
-    super.key,
-    required this.report,
-  });
+  const ReportDetailDialog({super.key, required this.report});
 
   static void show(BuildContext context, Report report) {
     showDialog(
@@ -40,7 +37,7 @@ class ReportDetailDialog extends StatelessWidget {
           children: [
             // Header
             _buildHeader(context),
-            
+
             // Content
             Expanded(
               child: Padding(
@@ -50,18 +47,18 @@ class ReportDetailDialog extends StatelessWidget {
                   children: [
                     // Info laporan
                     _buildReportInfo(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Content area dengan gambar dan detail
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Gambar preview
                         _buildImagePreview(),
-                        
+
                         const SizedBox(width: 20),
-                        
+
                         // Detail info (Status + Catatan Petugas)
                         Expanded(
                           child: Column(
@@ -75,13 +72,11 @@ class ReportDetailDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // To-do list full width
-                    Expanded(
-                      child: _buildTasksList(),
-                    ),
+                    Expanded(child: _buildTasksList()),
                   ],
                 ),
               ),
@@ -96,9 +91,7 @@ class ReportDetailDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1)),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -117,16 +110,9 @@ class ReportDetailDialog extends StatelessWidget {
           ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.close,
-              color: Colors.grey,
-              size: 24,
-            ),
+            icon: const Icon(Icons.close, color: Colors.grey, size: 24),
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 32,
-              minHeight: 32,
-            ),
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
         ],
       ),
@@ -148,18 +134,12 @@ class ReportDetailDialog extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           '${report.tanggal}',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
         ),
         const SizedBox(height: 2),
         Text(
           'Laporan dari ${report.petugas}',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
         ),
       ],
     );
@@ -255,7 +235,8 @@ class ReportDetailDialog extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (report.catatanPetugas != null && report.catatanPetugas!.isNotEmpty) ...[
+        if (report.catatanPetugas != null &&
+            report.catatanPetugas!.isNotEmpty) ...[
           const Text(
             'Catatan Petugas',
             style: TextStyle(
@@ -313,12 +294,12 @@ class ReportDetailDialog extends StatelessWidget {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: task.isCompleted 
-                            ? const Color(0xFF4CAF50) 
+                        color: task.isCompleted
+                            ? const Color(0xFF4CAF50)
                             : Colors.transparent,
                         border: Border.all(
-                          color: task.isCompleted 
-                              ? const Color(0xFF4CAF50) 
+                          color: task.isCompleted
+                              ? const Color(0xFF4CAF50)
                               : Colors.grey.shade400,
                           width: 2,
                         ),
@@ -338,11 +319,11 @@ class ReportDetailDialog extends StatelessWidget {
                         task.description,
                         style: TextStyle(
                           fontSize: 13,
-                          color: task.isCompleted 
-                              ? Colors.black87 
+                          color: task.isCompleted
+                              ? Colors.black87
                               : Colors.grey.shade600,
-                          decoration: task.isCompleted 
-                              ? TextDecoration.lineThrough 
+                          decoration: task.isCompleted
+                              ? TextDecoration.lineThrough
                               : TextDecoration.none,
                           decorationColor: Colors.grey.shade500,
                         ),

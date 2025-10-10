@@ -32,7 +32,10 @@ class ReportRepositoryImpl implements ReportRepository {
   Future<List<Report>> getReportsByPetugas(String petugasName) async {
     await Future.delayed(const Duration(milliseconds: 400));
     return SampleReportData.reports
-        .where((report) => report.petugas.toLowerCase().contains(petugasName.toLowerCase()))
+        .where(
+          (report) =>
+              report.petugas.toLowerCase().contains(petugasName.toLowerCase()),
+        )
         .toList();
   }
 
@@ -40,9 +43,13 @@ class ReportRepositoryImpl implements ReportRepository {
   Future<bool> updateReportStatus(int id, ReportStatus status) async {
     await Future.delayed(const Duration(milliseconds: 600));
     try {
-      final reportIndex = SampleReportData.reports.indexWhere((report) => report.id == id);
+      final reportIndex = SampleReportData.reports.indexWhere(
+        (report) => report.id == id,
+      );
       if (reportIndex != -1) {
-        SampleReportData.reports[reportIndex] = SampleReportData.reports[reportIndex].copyWith(status: status);
+        SampleReportData.reports[reportIndex] = SampleReportData
+            .reports[reportIndex]
+            .copyWith(status: status);
         return true;
       }
       return false;
@@ -55,9 +62,13 @@ class ReportRepositoryImpl implements ReportRepository {
   Future<bool> addAdminNote(int id, String note) async {
     await Future.delayed(const Duration(milliseconds: 500));
     try {
-      final reportIndex = SampleReportData.reports.indexWhere((report) => report.id == id);
+      final reportIndex = SampleReportData.reports.indexWhere(
+        (report) => report.id == id,
+      );
       if (reportIndex != -1) {
-        SampleReportData.reports[reportIndex] = SampleReportData.reports[reportIndex].copyWith(catatanAdmin: note);
+        SampleReportData.reports[reportIndex] = SampleReportData
+            .reports[reportIndex]
+            .copyWith(catatanAdmin: note);
         return true;
       }
       return false;
@@ -70,7 +81,9 @@ class ReportRepositoryImpl implements ReportRepository {
   Future<bool> updateReport(Report report) async {
     await Future.delayed(const Duration(milliseconds: 600));
     try {
-      final reportIndex = SampleReportData.reports.indexWhere((r) => r.id == report.id);
+      final reportIndex = SampleReportData.reports.indexWhere(
+        (r) => r.id == report.id,
+      );
       if (reportIndex != -1) {
         SampleReportData.reports[reportIndex] = report;
         return true;

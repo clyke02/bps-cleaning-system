@@ -9,7 +9,7 @@ class AppTheme {
         seedColor: AppColors.primary,
         brightness: Brightness.light,
       ),
-      
+
       // App Bar Theme
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.white,
@@ -21,18 +21,16 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
       ),
-      
+
       // Card Theme
       cardTheme: const CardThemeData(
         color: AppColors.cardBackground,
         elevation: AppSizes.elevationM,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(AppSizes.radiusM),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusM)),
         ),
       ),
-      
+
       // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -41,9 +39,7 @@ class AppTheme {
           elevation: AppSizes.elevationS,
           minimumSize: const Size(double.infinity, AppSizes.buttonHeightL),
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(AppSizes.radiusS),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
           ),
           textStyle: const TextStyle(
             fontSize: AppSizes.fontM,
@@ -51,7 +47,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Outlined Button Theme
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -59,9 +55,7 @@ class AppTheme {
           minimumSize: const Size(double.infinity, AppSizes.buttonHeightL),
           side: const BorderSide(color: AppColors.primary),
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(AppSizes.radiusS),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
           ),
           textStyle: const TextStyle(
             fontSize: AppSizes.fontM,
@@ -69,33 +63,25 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Input Decoration Theme
       inputDecorationTheme: const InputDecorationTheme(
         filled: true,
         fillColor: AppColors.grey50,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(AppSizes.radiusS),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
           borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(AppSizes.radiusS),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
           borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(AppSizes.radiusS),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
           borderSide: BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(AppSizes.radiusS),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
           borderSide: BorderSide(color: AppColors.error),
         ),
         contentPadding: EdgeInsets.symmetric(
@@ -103,7 +89,7 @@ class AppTheme {
           vertical: AppSizes.paddingS,
         ),
       ),
-      
+
       // Text Theme
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
@@ -142,10 +128,10 @@ class AppTheme {
           color: AppColors.textPrimary,
         ),
       ),
-      
+
       // Scaffold Background
       scaffoldBackgroundColor: AppColors.background,
-      
+
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.white,
@@ -156,7 +142,7 @@ class AppTheme {
       ),
     );
   }
-  
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

@@ -28,11 +28,7 @@ class SampleReportData {
           description: 'Membersihkan komputer dan monitor',
           isCompleted: true,
         ),
-        CleaningTask(
-          id: 4,
-          description: 'Menyapu lantai',
-          isCompleted: true,
-        ),
+        CleaningTask(id: 4, description: 'Menyapu lantai', isCompleted: true),
       ],
     ),
     Report(
