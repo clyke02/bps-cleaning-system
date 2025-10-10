@@ -70,8 +70,6 @@ class _AreaContentWidgetState extends State<AreaContentWidget> {
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
                                 color: Colors.black,
-                                decoration: TextDecoration.underline,
-                                decorationThickness: 2,
                               ),
                             ),
                           ),

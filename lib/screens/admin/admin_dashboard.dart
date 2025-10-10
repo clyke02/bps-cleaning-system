@@ -41,15 +41,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+            spreadRadius: 1,
           ),
         ],
       ),
@@ -61,11 +62,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/logo.png',
-                width: 54,
-                height: 54,
-                fit: BoxFit.contain,
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.contain,
+                ),
               ),
               const SizedBox(width: 10),
               const Column(
@@ -75,21 +83,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   Text(
                     'BPS Sukabumi',
                     style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 20,
-                      color: Colors.black,
-                      letterSpacing: 0.1,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      color: Colors.black87,
+                      letterSpacing: 0.3,
                     ),
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Sistem Kebersihan',
+                    'Admin Dashboard',
                     style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 13,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
                       height: 1.1,
-                      letterSpacing: 0.1,
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ],
@@ -102,16 +110,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                constraints: const BoxConstraints(maxWidth: 120),
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(50),
-                  boxShadow: const [
+                  border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -124,62 +132,58 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       height: 28,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.black87, width: 1.3),
+                        color: const Color(0xFF4CAF50),
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Center(
                         child: Icon(
-                          Icons.person_outline,
-                          size: 18,
-                          color: Colors.black87,
+                          Icons.person,
+                          size: 16,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Flexible(
-                      child: Text(
-                        'Bambang',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 11,
-                          letterSpacing: 0.1,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black12,
-                              blurRadius: 1,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Bambang',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.red.shade50,
+                          border: Border.all(color: Colors.red.shade200, width: 1),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.logout,
+                            size: 14,
+                            color: Colors.red.shade600,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 4),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 0,
-                  ),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: Color(0xFFBDBDBD)),
-                  ),
-                  elevation: 1,
-                ),
-                child: const Text('Keluar'),
               ),
             ],
           ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../models/report_model.dart';
 import '../data/sample_report_data.dart';
 import 'report_card.dart';
+import 'report_detail_dialog.dart';
+import 'add_catatan_dialog.dart';
 
 class LaporanContentWidget extends StatelessWidget {
   final Map<String, int> weeklySummary;
@@ -28,7 +30,7 @@ class LaporanContentWidget extends StatelessWidget {
           _buildWeeklySummary(),
 
           // SEARCH DAN LIST LAPORAN
-          _buildReportsList(),
+          _buildReportsList(context),
         ],
       ),
     );
@@ -41,17 +43,24 @@ class LaporanContentWidget extends StatelessWidget {
       child: Center(
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.13),
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+                spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
+            border: Border.all(color: Colors.grey.shade100, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,8 +74,6 @@ class LaporanContentWidget extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                         color: Colors.black,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 2,
                       ),
                     ),
                   ),
@@ -118,21 +125,28 @@ class LaporanContentWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildReportsList() {
+  Widget _buildReportsList(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
+          border: Border.all(color: Colors.grey.shade100, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,10 +207,10 @@ class LaporanContentWidget extends StatelessWidget {
                 .map(
                   (report) => ReportCard(
                     report: report,
-                    onDetailPressed: () => _showReportDetail(report),
+                    onDetailPressed: () => _showReportDetail(context, report),
                     onSetujuPressed: () => _setujuiLaporan(report),
                     onTolakPressed: () => _tolakLaporan(report),
-                    onBeriCatatanPressed: () => _beriCatatan(report),
+                    onBeriCatatanPressed: () => _beriCatatan(context, report),
                     onDownloadPressed: () => _downloadLaporan(report),
                   ),
                 )
@@ -207,9 +221,9 @@ class LaporanContentWidget extends StatelessWidget {
     );
   }
 
-  void _showReportDetail(Report report) {
-    // TODO: Implement show detail dialog
-    print('Show detail for: ${report.title}');
+  void _showReportDetail(BuildContext context, Report report) {
+    // Show detail dialog
+    ReportDetailDialog.show(context, report);
   }
 
   void _setujuiLaporan(Report report) {
@@ -222,9 +236,9 @@ class LaporanContentWidget extends StatelessWidget {
     print('Tolak laporan: ${report.title}');
   }
 
-  void _beriCatatan(Report report) {
-    // TODO: Implement beri catatan dialog
-    print('Beri catatan untuk: ${report.title}');
+  void _beriCatatan(BuildContext context, Report report) {
+    // Show add catatan dialog
+    AddCatatanDialog.show(context, report);
   }
 
   void _downloadLaporan(Report report) {

@@ -23,6 +23,16 @@ class SampleReportData {
           description: 'Membersihkan meja',
           isCompleted: true,
         ),
+        CleaningTask(
+          id: 3,
+          description: 'Membersihkan komputer dan monitor',
+          isCompleted: true,
+        ),
+        CleaningTask(
+          id: 4,
+          description: 'Menyapu lantai',
+          isCompleted: true,
+        ),
       ],
     ),
     Report(
@@ -39,19 +49,44 @@ class SampleReportData {
       areaId: 2,
       tasks: [
         CleaningTask(
-          id: 3,
+          id: 5,
           description: 'Mengepel lantai toilet',
           isCompleted: true,
         ),
         CleaningTask(
-          id: 4,
-          description: 'Membersihkan kloset',
+          id: 6,
+          description: 'Membersihkan kloset duduk/jongkok',
           isCompleted: true,
         ),
         CleaningTask(
-          id: 5,
+          id: 7,
           description: 'Membersihkan wastafel',
           isCompleted: true,
+        ),
+        CleaningTask(
+          id: 8,
+          description: 'Membersihkan cermin',
+          isCompleted: true,
+        ),
+        CleaningTask(
+          id: 9,
+          description: 'Membersihkan dinding/keramik',
+          isCompleted: false,
+        ),
+        CleaningTask(
+          id: 10,
+          description: 'Mengosongkan tempat sampah toilet',
+          isCompleted: true,
+        ),
+        CleaningTask(
+          id: 11,
+          description: 'Mengosongkan tempat sampah toilet',
+          isCompleted: true,
+        ),
+        CleaningTask(
+          id: 12,
+          description: 'Lainnya: Mengganti ulang sabun cuci tangan',
+          isCompleted: false,
         ),
       ],
     ),
