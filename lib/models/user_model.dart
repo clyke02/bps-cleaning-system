@@ -3,6 +3,8 @@ class User {
   final String name;
   final String email;
   final String role;
+  final String? username;
+  final String? phoneNumber;
   final DateTime? emailVerifiedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -12,6 +14,8 @@ class User {
     required this.name,
     required this.email,
     required this.role,
+    this.username,
+    this.phoneNumber,
     this.emailVerifiedAt,
     required this.createdAt,
     required this.updatedAt,
@@ -24,6 +28,8 @@ class User {
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       role: json['role'] ?? 'user',
+      username: json['username'],
+      phoneNumber: json['phone_number'],
       emailVerifiedAt: json['email_verified_at'] != null
           ? DateTime.parse(json['email_verified_at'])
           : null,
@@ -43,6 +49,8 @@ class User {
       'name': name,
       'email': email,
       'role': role,
+      'username': username,
+      'phone_number': phoneNumber,
       'email_verified_at': emailVerifiedAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -83,6 +91,8 @@ class User {
     String? name,
     String? email,
     String? role,
+    String? username,
+    String? phoneNumber,
     DateTime? emailVerifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -92,6 +102,8 @@ class User {
       name: name ?? this.name,
       email: email ?? this.email,
       role: role ?? this.role,
+      username: username ?? this.username,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
       emailVerifiedAt: emailVerifiedAt ?? this.emailVerifiedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
