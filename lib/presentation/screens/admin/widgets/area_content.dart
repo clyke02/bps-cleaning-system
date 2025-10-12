@@ -200,10 +200,10 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
   final _namaAreaController = TextEditingController();
   final _nomorRuanganController = TextEditingController();
   final _keteranganController = TextEditingController();
-  
+
   String? _selectedLantai;
   final List<String> _lantaiOptions = ['1', '2'];
-  
+
   List<String> _kebersihanList = [];
   final List<bool> _kebersihanChecked = [];
 
@@ -349,11 +349,15 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -414,11 +418,15 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -514,12 +522,21 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
                                 ),
                               )
                             : Column(
-                                children: List.generate(_kebersihanList.length, (index) {
+                                children: List.generate(_kebersihanList.length, (
+                                  index,
+                                ) {
                                   return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
                                       border: index < _kebersihanList.length - 1
-                                          ? Border(bottom: BorderSide(color: Colors.grey[200]!))
+                                          ? Border(
+                                              bottom: BorderSide(
+                                                color: Colors.grey[200]!,
+                                              ),
+                                            )
                                           : null,
                                     ),
                                     child: Row(
@@ -528,7 +545,8 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
                                           value: _kebersihanChecked[index],
                                           onChanged: (bool? value) {
                                             setState(() {
-                                              _kebersihanChecked[index] = value ?? false;
+                                              _kebersihanChecked[index] =
+                                                  value ?? false;
                                             });
                                           },
                                           activeColor: const Color(0xFF4CAF50),
@@ -544,7 +562,8 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
                                         ),
                                         // Always show delete button for all items
                                         GestureDetector(
-                                          onTap: () => _removeKebersihanItem(index),
+                                          onTap: () =>
+                                              _removeKebersihanItem(index),
                                           child: const Icon(
                                             Icons.close,
                                             color: Colors.red,

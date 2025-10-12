@@ -1,17 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UserDashboard extends StatelessWidget {
+class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
+
+  @override
+  State<UserDashboard> createState() => _UserDashboardState();
+}
+
+class _UserDashboardState extends State<UserDashboard> {
+  String _userName = 'User'; // Default fallback
+  bool _isLoggingOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userName = prefs.getString('user_name');
+    if (userName != null && userName.isNotEmpty) {
+      setState(() {
+        _userName = userName;
+      });
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    setState(() {
+      _isLoggingOut = true;
+    });
+
+    try {
+      // Clear user data from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      // Navigate to login
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } catch (e) {
+      print('Error during logout: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoggingOut = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // Dummy list aktivitas
     final List<Map<String, String>> aktivitasList = [
-      {"title": "Ruang Pengolahan Data", "floor": "Lantai 1", "room": "R.012", "date": "25-08-2025"},
-      {"title": "Toilet", "floor": "Lantai 1", "room": "R.013", "date": "25-08-2025"},
-      {"title": "Mushola", "floor": "Lantai 1", "room": "R.014", "date": "25-08-2025"},
-      {"title": "Ruang Server & IT", "floor": "Lantai 2", "room": "R.021", "date": "25-08-2025"},
-      {"title": "Dapur", "floor": "Lantai 1", "room": "R.015", "date": "25-08-2025"},
+      {
+        "title": "Ruang Pengolahan Data",
+        "floor": "Lantai 1",
+        "room": "R.012",
+        "date": "25-08-2025",
+      },
+      {
+        "title": "Toilet",
+        "floor": "Lantai 1",
+        "room": "R.013",
+        "date": "25-08-2025",
+      },
+      {
+        "title": "Mushola",
+        "floor": "Lantai 1",
+        "room": "R.014",
+        "date": "25-08-2025",
+      },
+      {
+        "title": "Ruang Server & IT",
+        "floor": "Lantai 2",
+        "room": "R.021",
+        "date": "25-08-2025",
+      },
+      {
+        "title": "Dapur",
+        "floor": "Lantai 1",
+        "room": "R.015",
+        "date": "25-08-2025",
+      },
     ];
 
     return Scaffold(
@@ -22,7 +97,11 @@ class UserDashboard extends StatelessWidget {
           decoration: const BoxDecoration(
             color: Colors.white,
             boxShadow: [
-              BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
             ],
           ),
           child: SafeArea(
@@ -38,10 +117,20 @@ class UserDashboard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("BPS Sukabumi",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                          Text("Sistem Kebersihan",
-                              style: TextStyle(fontSize: 11, color: Colors.black54)),
+                          Text(
+                            "BPS Sukabumi",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            "Sistem Kebersihan",
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.black54,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -58,7 +147,10 @@ class UserDashboard extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, '/notifikasi');
                         },
-                        icon: const Icon(Icons.notifications, color: Colors.black87),
+                        icon: const Icon(
+                          Icons.notifications,
+                          color: Colors.black87,
+                        ),
                       ),
 
                       // 👤 Logo profil jadi tombol
@@ -76,8 +168,11 @@ class UserDashboard extends StatelessWidget {
                       // 📝 Nama User
                       Flexible(
                         child: Text(
-                          "Bambang Firman Fatoni",
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                          _userName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -85,11 +180,18 @@ class UserDashboard extends StatelessWidget {
 
                       // 🚪 Tombol Keluar pakai icon
                       IconButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                        icon: const Icon(Icons.logout, color: Colors.red),
-                        tooltip: "Keluar",
+                        onPressed: _isLoggingOut ? null : _handleLogout,
+                        icon: _isLoggingOut
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.red,
+                                ),
+                              )
+                            : const Icon(Icons.logout, color: Colors.red),
+                        tooltip: _isLoggingOut ? "Logging out..." : "Keluar",
                       ),
                     ],
                   ),
@@ -114,15 +216,18 @@ class UserDashboard extends StatelessWidget {
           children: [
             const SizedBox(height: 40),
             // Header text
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Column(
                 children: [
                   Text(
-                    "Selamat Datang, Bambang Firman Fatoni!",
+                    "Selamat Datang, $_userName!",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -143,7 +248,11 @@ class UserDashboard extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: const [
-                    BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -151,7 +260,10 @@ class UserDashboard extends StatelessWidget {
                   children: [
                     const Text(
                       "Aktivitas Terbaru",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     const Divider(color: Colors.grey, thickness: 0.5),
@@ -171,7 +283,8 @@ class UserDashboard extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DetailPage(item: item),
+                                    builder: (context) =>
+                                        DetailPage(item: item),
                                   ),
                                 );
                               },
@@ -201,12 +314,21 @@ class UserDashboard extends StatelessWidget {
         onTap: (index) {},
         items: [
           BottomNavigationBarItem(
-              icon: Image.asset("assets/images/home.png", height: 22), label: "Home"),
+            icon: Image.asset("assets/images/home.png", height: 22),
+            label: "Home",
+          ),
           BottomNavigationBarItem(
-              icon: Image.asset("assets/images/laporan.png", height: 22), label: "Laporan Darurat"),
-          const BottomNavigationBarItem(icon: Icon(Icons.history), label: "Riwayat"),
+            icon: Image.asset("assets/images/laporan.png", height: 22),
+            label: "Laporan Darurat",
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: "Riwayat",
+          ),
           BottomNavigationBarItem(
-              icon: Image.asset("assets/images/setting.png", height: 22), label: "Setting"),
+            icon: Image.asset("assets/images/setting.png", height: 22),
+            label: "Setting",
+          ),
         ],
       ),
     );
@@ -231,9 +353,15 @@ class UserDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 13, color: Colors.grey),
+          ),
         ],
       ),
     );
@@ -257,13 +385,25 @@ class DetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Nama Ruangan: ${item['title']}", style: const TextStyle(fontSize: 18)),
+            Text(
+              "Nama Ruangan: ${item['title']}",
+              style: const TextStyle(fontSize: 18),
+            ),
             const SizedBox(height: 10),
-            Text("Lantai: ${item['floor']}", style: const TextStyle(fontSize: 16)),
+            Text(
+              "Lantai: ${item['floor']}",
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 10),
-            Text("Nomor Ruangan: ${item['room']}", style: const TextStyle(fontSize: 16)),
+            Text(
+              "Nomor Ruangan: ${item['room']}",
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 10),
-            Text("Tanggal: ${item['date']}", style: const TextStyle(fontSize: 16)),
+            Text(
+              "Tanggal: ${item['date']}",
+              style: const TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),

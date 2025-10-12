@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../data/repositories/user_repository.dart';
+import '../../../data/models/user.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,14 +11,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final UserRepository _userRepository = UserRepository();
   bool _isLoading = false;
 
   Future<void> _login() async {
     // Validasi form
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      _showSnackBar('Email dan password harus diisi');
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      _showSnackBar('Username dan password harus diisi');
       return;
     }
 
@@ -26,30 +28,58 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:8000/api/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }),
+      final result = await _userRepository.login(
+        username: _usernameController.text.trim(),
+        password: _passwordController.text,
       );
 
-      final responseData = json.decode(response.body);
+      final User user = result['user'];
+      final String token = result['token'];
 
-      if (responseData['success'] == true) {
-        final userRole = responseData['user']['role'];
+      // Save user data to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', user.name);
+      await prefs.setString('user_username', user.username);
+      await prefs.setString('user_role', user.role);
+      await prefs.setString('auth_token', token);
 
-        if (userRole == 'admin') {
-          Navigator.pushReplacementNamed(context, '/admin');
-        } else {
-          Navigator.pushReplacementNamed(context, '/user');
-        }
+      if (user.isAdmin) {
+        Navigator.pushReplacementNamed(context, '/admin');
       } else {
-        _showSnackBar(responseData['message'] ?? 'Login gagal');
+        Navigator.pushReplacementNamed(context, '/user');
       }
+
+      _showSnackBar('Selamat datang, ${user.name}!');
     } catch (e) {
-      _showSnackBar('Terjadi kesalahan: ${e.toString()}');
+      String errorMessage = e
+          .toString()
+          .replaceFirst('Exception: ', '')
+          .replaceFirst('Login failed: ', '')
+          .replaceFirst('Exception:', '')
+          .replaceFirst('Login failed:', '');
+
+      // Clean up common error prefixes
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
+      if (errorMessage.startsWith('Login failed: ')) {
+        errorMessage = errorMessage.substring(14);
+      }
+
+      // Default user-friendly messages
+      if (errorMessage.contains('Invalid credentials') ||
+          errorMessage.contains('Unauthorized') ||
+          errorMessage.contains('401')) {
+        errorMessage = 'Username atau Password salah, harap coba lagi';
+      } else if (errorMessage.contains('Connection refused') ||
+          errorMessage.contains('tidak dapat terhubung')) {
+        errorMessage =
+            'Tidak dapat terhubung ke server, periksa koneksi internet';
+      } else if (errorMessage.isEmpty) {
+        errorMessage = 'Terjadi kesalahan, silakan coba lagi';
+      }
+
+      _showSnackBar(errorMessage);
     } finally {
       setState(() {
         _isLoading = false;
@@ -58,9 +88,26 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        backgroundColor: message.contains('Selamat datang')
+            ? Colors.green[600]
+            : Colors.red[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        elevation: 6,
+        duration: Duration(seconds: message.contains('Selamat datang') ? 2 : 4),
+      ),
+    );
   }
 
   @override
@@ -135,15 +182,15 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: [
-                        // Email field
+                        // Username field
                         TextFormField(
-                          controller: _emailController,
+                          controller: _usernameController,
                           decoration: const InputDecoration(
-                            labelText: 'Email/Username',
+                            labelText: 'Username',
                             prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(),
                           ),
-                          keyboardType: TextInputType.emailAddress,
+                          keyboardType: TextInputType.text,
                         ),
                         const SizedBox(height: 16),
 
@@ -220,7 +267,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }

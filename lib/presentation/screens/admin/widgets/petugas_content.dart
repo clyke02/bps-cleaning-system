@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/ringkasan_widget.dart';
+import '../../../../data/models/user.dart';
+import '../../../../data/repositories/user_repository.dart';
 
 class PetugasContentWidget extends StatefulWidget {
   final Map<String, int>? weeklySummary;
@@ -11,15 +13,36 @@ class PetugasContentWidget extends StatefulWidget {
 }
 
 class _PetugasContentWidgetState extends State<PetugasContentWidget> {
-  final List<Map<String, String>> staffList = [
-    {'name': 'Ahmad Suryadi', 'phone': '081234567890'},
-    {'name': 'Budi Santoso', 'phone': '081234567890'},
-    {'name': 'Siti Aminah', 'phone': '081234567890'},
-    {'name': 'Joko Purnomo', 'phone': '081234567890'},
-    {'name': 'Adit', 'phone': '081234567890'},
-    {'name': 'Jajang', 'phone': '081234567890'},
-    {'name': 'Yudi', 'phone': '081234567890'},
-  ];
+  final UserRepository _userRepository = UserRepository();
+  List<User> staffList = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    try {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
+
+      final users = await _userRepository.getAllUsers();
+      setState(() {
+        staffList = users;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,10 +122,88 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                     ),
                     const SizedBox(height: 16),
 
-                    // List Petugas
-                    ...staffList
-                        .map((staff) => _buildStaffCard(staff))
-                        .toList(),
+                    // List Petugas - Loading/Error/Data States
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF4CAF50),
+                          ),
+                        ),
+                      )
+                    else if (errorMessage != null)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 48,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Gagal memuat data petugas',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                errorMessage!,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _loadUsers,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4CAF50),
+                                ),
+                                child: const Text(
+                                  'Coba Lagi',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else if (staffList.isEmpty)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.people_outline,
+                                color: Colors.grey,
+                                size: 48,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Belum ada data petugas',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      ...staffList
+                          .map((staff) => _buildStaffCard(staff))
+                          .toList(),
                   ],
                 ),
               ),
@@ -113,7 +214,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
     );
   }
 
-  Widget _buildStaffCard(Map<String, String> staff) {
+  Widget _buildStaffCard(User staff) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -142,12 +243,14 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50),
+              color: staff.isAdmin
+                  ? const Color(0xFF2196F3)
+                  : const Color(0xFF4CAF50),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Center(
               child: Text(
-                _getInitials(staff['name']!),
+                _getInitials(staff.name),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -163,17 +266,52 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  staff['name']!,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        staff.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: staff.isAdmin
+                            ? Colors.blue[100]
+                            : Colors.green[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        staff.displayRole,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: staff.isAdmin
+                              ? Colors.blue[700]
+                              : Colors.green[700],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  staff['phone']!,
+                  staff.phone.isNotEmpty ? staff.phone : 'No phone number',
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '@${staff.username}',
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
               ],
             ),
@@ -225,12 +363,16 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        return const TambahPetugasDialog();
+        return TambahPetugasDialog(
+          onUserAdded: () {
+            _loadUsers(); // Refresh data setelah user ditambahkan
+          },
+        );
       },
     );
   }
 
-  void _showEditPetugas(Map<String, String> staff) {
+  void _showEditPetugas(User staff) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -240,7 +382,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
     );
   }
 
-  void _showDeleteConfirmation(Map<String, String> staff) {
+  void _showDeleteConfirmation(User staff) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -288,7 +430,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                       radius: 20,
                       backgroundColor: Colors.red.withOpacity(0.2),
                       child: Text(
-                        _getInitials(staff['name']!),
+                        _getInitials(staff.name),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -302,7 +444,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            staff['name']!,
+                            staff.name,
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -310,7 +452,7 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
                             ),
                           ),
                           Text(
-                            staff['phone']!,
+                            staff.phone,
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -378,32 +520,55 @@ class _PetugasContentWidgetState extends State<PetugasContentWidget> {
     );
   }
 
-  void _handleDeletePetugas(Map<String, String> staff) {
+  Future<void> _handleDeletePetugas(User staff) async {
     // Close dialog
     Navigator.of(context).pop();
 
-    // TODO: Implement actual delete logic
-    print('Menghapus petugas: ${staff['name']}');
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Menghapus petugas...'),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
 
-    // Remove from list (for demo purposes)
-    setState(() {
-      staffList.removeWhere((s) => s['name'] == staff['name']);
-    });
+      // Delete from backend
+      await _userRepository.deleteUser(staff.id);
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Petugas ${staff['name']} berhasil dihapus'),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
+      // Remove from local list
+      setState(() {
+        staffList.removeWhere((s) => s.id == staff.id);
+      });
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Petugas ${staff.name} berhasil dihapus'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menghapus petugas: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
   }
 }
 
 class TambahPetugasDialog extends StatefulWidget {
-  const TambahPetugasDialog({super.key});
+  final Function() onUserAdded; // Callback untuk refresh data
+
+  const TambahPetugasDialog({super.key, required this.onUserAdded});
 
   @override
   State<TambahPetugasDialog> createState() => _TambahPetugasDialogState();
@@ -415,6 +580,14 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
   final _teleponController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final UserRepository _userRepository = UserRepository();
+
+  String? _selectedRole;
+  bool _isLoading = false;
+  final List<Map<String, String>> _roleOptions = [
+    {'value': 'admin', 'label': 'Admin'},
+    {'value': 'user', 'label': 'Petugas'},
+  ];
 
   @override
   void dispose() {
@@ -669,6 +842,62 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                         return null;
                       },
                     ),
+                    const SizedBox(height: 16),
+
+                    // Role Selection
+                    const Text(
+                      'Role',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      value: _selectedRole,
+                      hint: Text(
+                        'Pilih Role',
+                        style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                      ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF4CAF50),
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      items: _roleOptions.map((Map<String, String> role) {
+                        return DropdownMenuItem<String>(
+                          value: role['value'],
+                          child: Text(role['label']!),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedRole = newValue;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Pilih role';
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 24),
 
                     // Submit Button
@@ -703,28 +932,68 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
     );
   }
 
-  void _handleSubmit() {
+  Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual staff addition logic
-      print('Nama: ${_namaController.text}');
-      print('Telepon: ${_teleponController.text}');
-      print('Username: ${_usernameController.text}');
-      print('Password: ${_passwordController.text}');
+      setState(() {
+        _isLoading = true;
+      });
 
-      Navigator.of(context).pop();
+      try {
+        // Create user via API
+        await _userRepository.createUser(
+          name: _namaController.text.trim(),
+          username: _usernameController.text.trim(),
+          phone: _teleponController.text.trim(),
+          password: _passwordController.text,
+          role: _selectedRole!,
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Petugas berhasil ditambahkan!'),
-          backgroundColor: Color(0xFF4CAF50),
-        ),
-      );
+        // Close dialog
+        Navigator.of(context).pop();
+
+        // Call callback to refresh data
+        widget.onUserAdded();
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${_selectedRole == 'admin' ? 'Admin' : 'Petugas'} berhasil ditambahkan!',
+            ),
+            backgroundColor: const Color(0xFF4CAF50),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Gagal menambahkan ${_selectedRole == 'admin' ? 'admin' : 'petugas'}: ${e.toString()}',
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 }
 
 class EditPetugasDialog extends StatefulWidget {
-  final Map<String, String> staff;
+  final User staff;
 
   const EditPetugasDialog({super.key, required this.staff});
 
@@ -736,15 +1005,19 @@ class _EditPetugasDialogState extends State<EditPetugasDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _namaController;
   late final TextEditingController _teleponController;
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  late final TextEditingController _usernameController;
+  late final TextEditingController _passwordController;
+  String? _selectedRole;
 
   @override
   void initState() {
     super.initState();
     // Pre-populate form dengan data yang ada
-    _namaController = TextEditingController(text: widget.staff['name']);
-    _teleponController = TextEditingController(text: widget.staff['phone']);
+    _namaController = TextEditingController(text: widget.staff.name);
+    _teleponController = TextEditingController(text: widget.staff.phone);
+    _usernameController = TextEditingController(text: widget.staff.username);
+    _passwordController = TextEditingController(); // Kosong untuk password baru
+    _selectedRole = widget.staff.role;
   }
 
   @override

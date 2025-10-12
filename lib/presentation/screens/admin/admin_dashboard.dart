@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_navbar.dart';
 import 'widgets/laporan_content.dart';
 import 'widgets/petugas_content.dart';
@@ -15,6 +16,49 @@ class AdminDashboardPage extends StatefulWidget {
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int _selectedIndex = 0;
+  String _userName = 'Admin'; // Default fallback
+  bool _isLoggingOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userName = prefs.getString('user_name');
+    if (userName != null && userName.isNotEmpty) {
+      setState(() {
+        _userName = userName;
+      });
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    setState(() {
+      _isLoggingOut = true;
+    });
+
+    try {
+      // Clear user data from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      // Navigate to login
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } catch (e) {
+      print('Error during logout: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoggingOut = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +195,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Bambang',
-                      style: TextStyle(
+                    Text(
+                      _userName,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -162,9 +206,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, '/login');
-                      },
+                      onTap: _isLoggingOut ? null : _handleLogout,
                       child: Container(
                         width: 24,
                         height: 24,
@@ -177,11 +219,20 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           ),
                         ),
                         child: Center(
-                          child: Icon(
-                            Icons.logout,
-                            size: 14,
-                            color: Colors.red.shade600,
-                          ),
+                          child: _isLoggingOut
+                              ? SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.red.shade600,
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.logout,
+                                  size: 14,
+                                  color: Colors.red.shade600,
+                                ),
                         ),
                       ),
                     ),
