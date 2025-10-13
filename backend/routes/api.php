@@ -19,7 +19,7 @@ Route::get('/area-cleaning-tasks/{areaId}', [AreaController::class, 'getCleaning
 Route::get('/weekly-summary', [AreaController::class, 'getWeeklySummary']);
 Route::get('/cleaning-reports', [AreaController::class, 'getCleaningReports']);
 Route::post('/cleaning-reports', [AreaController::class, 'submitCleaningReport']);
-Route::get('/cleaning-reports', [AreaController::class, 'getCleaningReports']);
+Route::post('/emergency-reports', [AreaController::class, 'submitEmergencyReport']);
 
 // Reports API routes (without auth for now)
 Route::post('/cleaning-reports', [ReportController::class, 'store']);

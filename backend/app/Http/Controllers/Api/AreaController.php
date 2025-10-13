@@ -490,5 +490,46 @@ class AreaController extends Controller
         }
     }
 
+    public function submitEmergencyReport(Request $request)
+    {
+        try {
+            $request->validate([
+                'area_id' => 'required|exists:areas,id',
+                'lantai' => 'required|string',
+                'no_ruangan' => 'required|string',
+                'catatan' => 'required|string',
+                'photos' => 'array|max:5',
+                'photos.*' => 'file|mimes:jpeg,png,jpg|max:5120' // 5MB max
+            ]);
+
+            // For now, we'll return success as emergency reports would need a separate table
+            // In production, you'd want to create an emergency_reports table and store the data
+            return response()->json([
+                'success' => true,
+                'message' => 'Laporan darurat berhasil dikirim',
+                'data' => [
+                    'area_id' => $request->area_id,
+                    'lantai' => $request->lantai,
+                    'no_ruangan' => $request->no_ruangan,
+                    'catatan' => $request->catatan,
+                    'photos_count' => $request->hasFile('photos') ? count($request->file('photos')) : 0,
+                    'submitted_at' => now()->format('Y-m-d H:i:s')
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 }
