@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // Save user data to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('user_id', user.id);
       await prefs.setString('user_name', user.name);
       await prefs.setString('user_username', user.username);
       await prefs.setString('user_role', user.role);

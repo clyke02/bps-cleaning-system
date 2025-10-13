@@ -9,6 +9,7 @@ class HomeController extends GetxController {
   var isLoading = false.obs;
   var isLoadingAreas = false.obs;
   var areaList = <dynamic>[].obs;
+  var userReports = <dynamic>[].obs; // Laporan user hari ini
 
   @override
   void onInit() {
@@ -16,6 +17,7 @@ class HomeController extends GetxController {
     Environment.printConfig(); // Print konfigurasi saat init
     loadUserData();
     loadAreas();
+    loadUserReports();
   }
 
   Future<void> loadUserData() async {
@@ -71,9 +73,64 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<void> loadUserReports() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt('user_id');
+
+      if (userId == null) {
+        print('User ID not found');
+        return;
+      }
+
+      final baseUrl = Environment.baseUrl;
+      final response = await http.get(
+        Uri.parse('$baseUrl/cleaning-reports?user_id=$userId'),
+        headers: {'Accept': 'application/json'},
+      );
+
+      print('User reports response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          userReports.value = data['data'] ?? [];
+          print('Loaded ${userReports.length} user reports');
+        }
+      }
+    } catch (e) {
+      print('Error loading user reports: $e');
+    }
+  }
+
+  // Get report status for specific area
+  Map<String, dynamic>? getAreaReportStatus(int areaId) {
+    try {
+      // Find latest report for this area today
+      final today = DateTime.now();
+      final reportsForArea = userReports.where((report) {
+        final reportAreaId = report['area']?['id'];
+        final reportDate = DateTime.parse(report['submission_date'] ?? '');
+        return reportAreaId == areaId &&
+            reportDate.year == today.year &&
+            reportDate.month == today.month &&
+            reportDate.day == today.day;
+      }).toList();
+
+      if (reportsForArea.isNotEmpty) {
+        // Return latest report
+        return reportsForArea.first;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting area report status: $e');
+      return null;
+    }
+  }
+
   Future<void> refreshData() async {
     print('DEBUG: Refreshing home data...');
-    await Future.wait([loadUserData(), loadAreas()]);
+    await Future.wait([loadUserData(), loadAreas(), loadUserReports()]);
   }
 
   void clearData() {

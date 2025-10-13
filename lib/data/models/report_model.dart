@@ -23,6 +23,16 @@ class Report {
     this.tasks = const [],
   });
 
+  // Formatted date getter
+  String get formattedDate {
+    try {
+      final dateTime = DateTime.parse(tanggal);
+      return '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return tanggal; // Return original if parsing fails
+    }
+  }
+
   Report copyWith({
     int? id,
     String? title,
@@ -135,7 +145,7 @@ class CleaningTask {
   factory CleaningTask.fromJson(Map<String, dynamic> json) {
     return CleaningTask(
       id: json['id'] ?? 0,
-      description: json['description'] ?? '',
+      description: json['task_name'] ?? json['description'] ?? '',
       isCompleted: json['is_completed'] ?? false,
     );
   }

@@ -133,7 +133,7 @@ class ReportDetailDialog extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '${report.tanggal}',
+          report.formattedDate,
           style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
         ),
         const SizedBox(height: 2),
@@ -146,6 +146,13 @@ class ReportDetailDialog extends StatelessWidget {
   }
 
   Widget _buildImagePreview() {
+    // Debug: Print foto URLs
+    if (report.imagePaths.isNotEmpty) {
+      print('📸 Loading image from: ${report.imagePaths.first}');
+    } else {
+      print('⚠️ No images found in report');
+    }
+
     return Container(
       width: 200,
       height: 200,
@@ -160,7 +167,19 @@ class ReportDetailDialog extends StatelessWidget {
               child: Image.network(
                 report.imagePaths.first,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
                 errorBuilder: (context, error, stackTrace) {
+                  print('❌ Error loading image: $error');
                   return _buildImagePlaceholder();
                 },
               ),

@@ -1,5 +1,8 @@
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../../../../../data/models/report_model.dart';
+import '../../../../../../config/environment.dart';
 
 class LaporanController extends GetxController {
   // Reactive Variables
@@ -8,6 +11,13 @@ class LaporanController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
   final Rx<ReportStatus?> selectedFilter = Rx<ReportStatus?>(null);
+
+  // Weekly Summary
+  final Rx<Map<String, int>> weeklySummary = Rx<Map<String, int>>({
+    'Selesai': 0,
+    'Menunggu': 0,
+    'Ditolak': 0,
+  });
 
   // Filtered reports based on search and status
   List<Report> get filteredReports {
@@ -44,19 +54,111 @@ class LaporanController extends GetxController {
     loadReports();
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+    // Auto refresh saat controller ready
+    loadReports();
+  }
+
   // Load all reports
   Future<void> loadReports() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
-      // TODO: Implement actual API call to get reports from backend
-      // For now, load empty list since no reports from petugas yet
-      reportList.clear();
+      print('Loading reports from API...');
+
+      final response = await http.get(
+        Uri.parse('${Environment.baseUrl}/cleaning-reports'),
+        headers: {'Accept': 'application/json'},
+      );
+
+      print('Reports response: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          final List<dynamic> reportsJson = data['data'] ?? [];
+          reportList.value = reportsJson.map((json) {
+            // Map backend data to frontend Report model
+            return Report(
+              id: json['id'] ?? 0,
+              title: json['title'] ?? 'Laporan',
+              petugas: json['user']?['name'] ?? 'Unknown',
+              tanggal:
+                  json['submission_date'] ?? DateTime.now().toIso8601String(),
+              status: _mapStatus(json['status']),
+              imagePaths:
+                  (json['photos'] as List?)
+                      ?.map((p) => p['photo_path'] as String)
+                      .toList() ??
+                  [],
+              catatanPetugas: json['description'] ?? '',
+              catatanAdmin: json['admin_notes'],
+              areaId: json['area']?['id'] ?? 0,
+              tasks:
+                  (json['tasks'] as List?)
+                      ?.map(
+                        (t) => CleaningTask(
+                          id: t['id'] ?? 0,
+                          description: t['task_name'] ?? '',
+                          isCompleted: t['is_completed'] ?? false,
+                        ),
+                      )
+                      .toList() ??
+                  [],
+            );
+          }).toList();
+
+          print('Loaded ${reportList.length} reports');
+
+          // Update weekly summary
+          _updateWeeklySummary();
+        }
+      }
     } catch (e) {
       errorMessage.value = 'Gagal memuat laporan: ${e.toString()}';
+      print('Error loading reports: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Update weekly summary based on report list
+  void _updateWeeklySummary() {
+    int selesai = reportList
+        .where((r) => r.status == ReportStatus.selesai)
+        .length;
+    int menunggu = reportList
+        .where((r) => r.status == ReportStatus.menunggu)
+        .length;
+    int ditolak = reportList
+        .where((r) => r.status == ReportStatus.ditolak)
+        .length;
+
+    weeklySummary.value = {
+      'total': reportList.length,
+      'selesai': selesai,
+      'menunggu': menunggu,
+      'ditolak': ditolak,
+      'Selesai': selesai,
+      'Menunggu': menunggu,
+      'Ditolak': ditolak,
+    };
+  }
+
+  // Map backend status to frontend ReportStatus enum
+  ReportStatus _mapStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return ReportStatus.selesai;
+      case 'rejected':
+        return ReportStatus.ditolak;
+      case 'pending':
+      default:
+        return ReportStatus.menunggu;
     }
   }
 
@@ -76,22 +178,45 @@ class LaporanController extends GetxController {
   }
 
   // Update report status
-  Future<bool> updateReportStatus(int reportId, ReportStatus newStatus) async {
+  Future<bool> updateReportStatus(
+    String reportId,
+    ReportStatus newStatus,
+  ) async {
     try {
       isLoading.value = true;
 
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
+      // Map frontend status to backend status
+      String backendStatus;
+      switch (newStatus) {
+        case ReportStatus.selesai:
+          backendStatus = 'approved';
+          break;
+        case ReportStatus.ditolak:
+          backendStatus = 'rejected';
+          break;
+        default:
+          backendStatus = 'pending';
+      }
 
-      // Find and update report
-      final reportIndex = reportList.indexWhere(
-        (report) => report.id == reportId,
+      // TODO: Get admin user_id from SharedPreferences
+      // For now using dummy admin id
+      final response = await http.put(
+        Uri.parse('${Environment.baseUrl}/cleaning-reports/$reportId/status'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'status': backendStatus,
+          'reviewed_by': 1, // TODO: Replace with actual admin ID
+        }),
       );
-      if (reportIndex != -1) {
-        final updatedReport = reportList[reportIndex].copyWith(
-          status: newStatus,
-        );
-        reportList[reportIndex] = updatedReport;
+
+      print('Update status response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        // Reload reports to get updated data
+        await loadReports();
         return true;
       }
       return false;
@@ -129,26 +254,5 @@ class LaporanController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  // Get weekly summary
-  Map<String, int> get weeklySummary {
-    final total = reportList.length;
-    final selesai = reportList
-        .where((r) => r.status == ReportStatus.selesai)
-        .length;
-    final menunggu = reportList
-        .where((r) => r.status == ReportStatus.menunggu)
-        .length;
-    final ditolak = reportList
-        .where((r) => r.status == ReportStatus.ditolak)
-        .length;
-
-    return {
-      'total': total,
-      'selesai': selesai,
-      'menunggu': menunggu,
-      'ditolak': ditolak,
-    };
   }
 }

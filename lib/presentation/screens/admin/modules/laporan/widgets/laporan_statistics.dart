@@ -17,7 +17,7 @@ class LaporanStatistics extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               'Total',
-              summary['total']?.toString() ?? '0',
+              summary.value['total']?.toString() ?? '0',
               Colors.blue,
               Icons.assignment,
             ),
@@ -26,7 +26,7 @@ class LaporanStatistics extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               'Selesai',
-              summary['selesai']?.toString() ?? '0',
+              summary.value['selesai']?.toString() ?? '0',
               Colors.green,
               Icons.check_circle,
             ),
@@ -35,7 +35,7 @@ class LaporanStatistics extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               'Menunggu',
-              summary['menunggu']?.toString() ?? '0',
+              summary.value['menunggu']?.toString() ?? '0',
               Colors.orange,
               Icons.pending,
             ),
@@ -44,7 +44,7 @@ class LaporanStatistics extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               'Ditolak',
-              summary['ditolak']?.toString() ?? '0',
+              summary.value['ditolak']?.toString() ?? '0',
               Colors.red,
               Icons.cancel,
             ),

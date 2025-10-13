@@ -218,7 +218,10 @@ class LaporanCard extends StatelessWidget {
               leading: const Icon(Icons.check_circle, color: Colors.green),
               onTap: () {
                 Navigator.pop(context);
-                controller.updateReportStatus(report.id, ReportStatus.selesai);
+                controller.updateReportStatus(
+                  report.id.toString(),
+                  ReportStatus.selesai,
+                );
               },
             ),
             ListTile(
@@ -226,7 +229,10 @@ class LaporanCard extends StatelessWidget {
               leading: const Icon(Icons.cancel, color: Colors.red),
               onTap: () {
                 Navigator.pop(context);
-                controller.updateReportStatus(report.id, ReportStatus.ditolak);
+                controller.updateReportStatus(
+                  report.id.toString(),
+                  ReportStatus.ditolak,
+                );
               },
             ),
           ],

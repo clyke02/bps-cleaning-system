@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
+import 'cleaning_task_dialog.dart';
+import '../../../../admin/modules/area/controllers/area_controller.dart';
 
 class HomeView extends StatelessWidget {
   final Function(int)? onNavigateToTab;
@@ -163,69 +165,123 @@ class HomeView extends StatelessWidget {
   }
 
   Widget _buildAreaCard(dynamic area) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.blue[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.location_on_outlined,
-              color: Colors.blue[600],
-              size: 20,
-            ),
+    final controller = Get.find<HomeController>();
+
+    return GestureDetector(
+      onTap: () {
+        // Convert dynamic area to Area object
+        final areaObj = Area(
+          id: area['id'] ?? 0,
+          name: area['name'] ?? 'Area Tidak Dikenal',
+          lantai: area['lantai']?.toString() ?? 'Tidak ada info',
+          nomorRuangan: area['nomorRuangan']?.toString() ?? 'Tidak ada info',
+          kebersihan: List<String>.from(area['kebersihan'] ?? []),
+          keterangan: area['keterangan'] ?? 'Tidak ada deskripsi',
+          createdAt: area['createdAt'] != null
+              ? DateTime.parse(area['createdAt'])
+              : DateTime.now(),
+        );
+
+        // Show cleaning task dialog
+        Get.dialog(CleaningTaskDialog(area: areaObj));
+      },
+      child: Obx(() {
+        // Get report status for this area
+        final report = controller.getAreaReportStatus(area['id'] ?? 0);
+        final status = report?['status'] ?? 'not_reported';
+
+        // Determine status color and text
+        Color statusColor;
+        Color statusBgColor;
+        String statusText;
+
+        switch (status) {
+          case 'pending':
+            statusColor = Colors.orange[700]!;
+            statusBgColor = Colors.orange[100]!;
+            statusText = 'Menunggu';
+            break;
+          case 'approved':
+            statusColor = Colors.green[700]!;
+            statusBgColor = Colors.green[100]!;
+            statusText = 'Disetujui';
+            break;
+          case 'rejected':
+            statusColor = Colors.red[700]!;
+            statusBgColor = Colors.red[100]!;
+            statusText = 'Ditolak';
+            break;
+          default:
+            statusColor = Colors.blue[700]!;
+            statusBgColor = Colors.blue[100]!;
+            statusText = 'Belum Lapor';
+        }
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[200]!),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  area['name'] ?? 'Area Tidak Dikenal',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.blue[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.location_on_outlined,
+                  color: Colors.blue[600],
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      area['name'] ?? 'Area Tidak Dikenal',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      area['keterangan'] ?? 'Tidak ada deskripsi',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  statusText,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: statusColor,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  area['keterangan'] ?? 'Tidak ada deskripsi',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.orange[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              'Pending',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Colors.orange[700],
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }

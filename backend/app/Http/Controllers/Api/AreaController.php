@@ -298,4 +298,197 @@ class AreaController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get cleaning tasks for a specific area
+     */
+    public function getCleaningTasks(string $areaId): JsonResponse
+    {
+        try {
+            $area = Area::findOrFail($areaId);
+            $cleaningTasks = AreaCleaningTask::where('area_id', $areaId)->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cleaning tasks retrieved successfully',
+                'data' => $cleaningTasks->map(function ($task) {
+                    return [
+                        'id' => $task->id,
+                        'area_id' => $task->area_id,
+                        'task_name' => $task->task_name,
+                        'description' => $task->task_name, // Use task_name as description for now
+                        'is_required' => $task->is_required,
+                        'is_completed' => false, // Default to false, will be set by user
+                    ];
+                })
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve cleaning tasks',
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
+
+    /**
+     * Get weekly summary for reports
+     */
+    public function getWeeklySummary(): JsonResponse
+    {
+        try {
+            // Get reports from this week (assuming we have CleaningReport model)
+            // For now, return dummy data since we don't have the reports table yet
+            $weeklySummary = [
+                'Selesai' => 7,
+                'Menunggu' => 3,
+                'Ditolak' => 2,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Weekly summary retrieved successfully',
+                'data' => $weeklySummary
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve weekly summary',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get cleaning reports for admin
+     */
+    public function getCleaningReports(): JsonResponse
+    {
+        try {
+            // Dummy reports data with task IDs that reference area_cleaning_tasks
+            $reportsData = [
+                [
+                    'id' => 1,
+                    'title' => 'Lantai 1 - Laporan Pembersihan - Ruang Kerja',
+                    'submission_date' => '2025-10-13T12:53:02',
+                    'status' => 'pending',
+                    'user' => [
+                        'id' => 1,
+                        'name' => 'Super Petugas'
+                    ],
+                    'area' => [
+                        'id' => 3,
+                        'name' => 'Ruang Kerja'
+                    ],
+                    'description' => 'Beres bos',
+                    'admin_notes' => null,
+                    'photos' => [],
+                    'completed_task_ids' => [5, 6], // Task IDs from area_cleaning_tasks
+                ],
+                [
+                    'id' => 2,
+                    'title' => 'Lantai 2 - Laporan Pembersihan - Kamar Mandi',
+                    'submission_date' => '2025-10-13T14:15:00',
+                    'status' => 'pending',
+                    'user' => [
+                        'id' => 1,
+                        'name' => 'Super Petugas'
+                    ],
+                    'area' => [
+                        'id' => 5,
+                        'name' => 'Kamar Mandi'
+                    ],
+                    'description' => 'Coba di cek',
+                    'admin_notes' => null,
+                    'photos' => [],
+                    'completed_task_ids' => [1, 2, 3], // Task IDs from area_cleaning_tasks
+                ]
+            ];
+
+            // Fetch actual task names from area_cleaning_tasks for each report
+            $reports = [];
+            foreach ($reportsData as $reportData) {
+                $taskIds = $reportData['completed_task_ids'];
+                
+                // Get actual task names from area_cleaning_tasks table
+                $tasks = AreaCleaningTask::whereIn('id', $taskIds)->get(['id', 'task_name']);
+                
+                $reportData['tasks'] = $tasks->map(function ($task) {
+                    return [
+                        'id' => $task->id,
+                        'task_name' => $task->task_name,
+                        'is_completed' => true
+                    ];
+                })->toArray();
+                
+                // Remove completed_task_ids as it's now in tasks array
+                unset($reportData['completed_task_ids']);
+                
+                $reports[] = $reportData;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cleaning reports retrieved successfully',
+                'data' => $reports
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve cleaning reports',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Submit cleaning report
+     */
+    public function submitCleaningReport(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'area_id' => 'required|integer|exists:areas,id',
+                'area_name' => 'required|string',
+                'lantai' => 'required|string',
+                'nomor_ruangan' => 'required|string',
+                'completed_task_ids' => 'required|string', // JSON string
+                'catatan_pembersihan' => 'required|string',
+                'photos.*' => 'image|mimes:jpeg,png,jpg|max:5120', // 5MB max
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // For now, just return success since we don't have the reports table yet
+            // In real implementation, you would save to database here
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Laporan pembersihan berhasil dikirim',
+                'data' => [
+                    'area_id' => $request->area_id,
+                    'status' => 'pending',
+                    'submitted_at' => now()
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to submit cleaning report',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 }

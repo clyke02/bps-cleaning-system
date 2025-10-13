@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 import 'admin_navbar.dart';
 import 'widgets/pengaturan_content.dart';
 import 'modules/laporan/views/laporan_view.dart';
+import 'modules/laporan/controllers/laporan_controller.dart';
 import 'modules/area/views/area_view.dart';
 import 'modules/petugas/views/petugas_view.dart';
 
@@ -51,6 +53,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           setState(() {
             _selectedIndex = index;
           });
+
+          // Auto refresh data saat pindah tab
+          if (index == 0) {
+            // Laporan tab - refresh reports
+            if (Get.isRegistered<LaporanController>()) {
+              Get.find<LaporanController>().loadReports();
+            }
+          }
         },
       ),
     );

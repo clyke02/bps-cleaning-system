@@ -31,7 +31,10 @@ class LaporanView extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           // RINGKASAN MINGGU INI
-          Obx(() => RingkasanWidget(weeklySummary: controller.weeklySummary)),
+          Obx(
+            () =>
+                RingkasanWidget(weeklySummary: controller.weeklySummary.value),
+          ),
 
           // SEARCH DAN LIST LAPORAN
           _buildReportsList(context, controller),
@@ -197,11 +200,11 @@ class LaporanView extends StatelessWidget {
   }
 
   void _setujuiLaporan(LaporanController controller, Report report) {
-    controller.updateReportStatus(report.id, ReportStatus.selesai);
+    controller.updateReportStatus(report.id.toString(), ReportStatus.selesai);
   }
 
   void _tolakLaporan(LaporanController controller, Report report) {
-    controller.updateReportStatus(report.id, ReportStatus.ditolak);
+    controller.updateReportStatus(report.id.toString(), ReportStatus.ditolak);
   }
 
   void _beriCatatan(BuildContext context, Report report) {
