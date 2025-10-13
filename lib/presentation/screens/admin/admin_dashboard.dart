@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_navbar.dart';
-import 'widgets/laporan_content.dart';
-import 'widgets/petugas_content.dart';
-import 'widgets/area_content.dart';
 import 'widgets/pengaturan_content.dart';
+import 'modules/petugas/views/petugas_view.dart';
+import 'modules/laporan/views/laporan_view.dart';
+import 'modules/area/views/area_view.dart';
 import '../../../data/datasources/sample_report_data.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -249,23 +249,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildContent() {
     switch (_selectedIndex) {
       case 0:
-        return LaporanContentWidget(
-          weeklySummary: SampleReportData.weeklySummary,
-        );
+        return LaporanView(weeklySummary: SampleReportData.weeklySummary);
       case 1:
-        return PetugasContentWidget(
-          weeklySummary: SampleReportData.weeklySummary,
-        );
+        return PetugasView(weeklySummary: SampleReportData.weeklySummary);
       case 2:
-        return AreaContentWidget(weeklySummary: SampleReportData.weeklySummary);
+        return AreaView(weeklySummary: SampleReportData.weeklySummary);
       case 3:
         return PengaturanContentWidget(
           weeklySummary: SampleReportData.weeklySummary,
         );
       default:
-        return LaporanContentWidget(
-          weeklySummary: SampleReportData.weeklySummary,
-        );
+        return LaporanView(weeklySummary: SampleReportData.weeklySummary);
     }
   }
 }

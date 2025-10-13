@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
-import '../../../../data/models/report_model.dart';
-import '../../../../data/datasources/sample_report_data.dart';
-import '../../../../shared/widgets/ringkasan_widget.dart';
-import 'report_card.dart';
-import 'report_detail_dialog.dart';
-import 'add_catatan_dialog.dart';
+import 'package:get/get.dart';
+import '../controllers/laporan_controller.dart';
+import '../../../../../../shared/widgets/ringkasan_widget.dart';
+import '../../../widgets/report_card.dart';
+import '../../../widgets/report_detail_dialog.dart';
+import '../../../widgets/add_catatan_dialog.dart';
+import '../../../../../../data/models/report_model.dart';
 
-class LaporanContentWidget extends StatelessWidget {
-  final Map<String, int> weeklySummary;
 
-  const LaporanContentWidget({super.key, required this.weeklySummary});
+class LaporanView extends StatelessWidget {
+  final Map<String, int>? weeklySummary;
+
+  const LaporanView({super.key, this.weeklySummary});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LaporanController());
+    
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -28,16 +32,19 @@ class LaporanContentWidget extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           // RINGKASAN MINGGU INI
-          RingkasanWidget(weeklySummary: weeklySummary),
+          RingkasanWidget(
+            weeklySummary: weeklySummary ?? 
+            {'total': 12, 'selesai': 7, 'menunggu': 3, 'ditolak': 2}
+          ),
 
           // SEARCH DAN LIST LAPORAN
-          _buildReportsList(context),
+          _buildReportsList(context, controller),
         ],
       ),
     );
   }
 
-  Widget _buildReportsList(BuildContext context) {
+  Widget _buildReportsList(BuildContext context, LaporanController controller) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Container(
@@ -86,6 +93,7 @@ class LaporanContentWidget extends StatelessWidget {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: TextField(
+                onChanged: controller.searchReports,
                 decoration: InputDecoration(
                   hintText: "Cari Ruangan",
                   hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
@@ -115,18 +123,45 @@ class LaporanContentWidget extends StatelessWidget {
             const SizedBox(height: 8),
 
             // LIST LAPORAN
-            ...SampleReportData.reports
-                .map(
-                  (report) => ReportCard(
-                    report: report,
-                    onDetailPressed: () => _showReportDetail(context, report),
-                    onSetujuPressed: () => _setujuiLaporan(report),
-                    onTolakPressed: () => _tolakLaporan(report),
-                    onBeriCatatanPressed: () => _beriCatatan(context, report),
-                    onDownloadPressed: () => _downloadLaporan(report),
+            Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
                   ),
-                )
-                .toList(),
+                );
+              }
+
+              final reports = controller.filteredReports;
+              
+              if (reports.isEmpty) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      'Tidak ada laporan ditemukan',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                );
+              }
+
+              return Column(
+                children: reports
+                    .map(
+                      (report) => ReportCard(
+                        report: report,
+                        onDetailPressed: () => _showReportDetail(context, report),
+                        onSetujuPressed: () => _setujuiLaporan(controller, report),
+                        onTolakPressed: () => _tolakLaporan(controller, report),
+                        onBeriCatatanPressed: () => _beriCatatan(context, report),
+                        onDownloadPressed: () => _downloadLaporan(report),
+                      ),
+                    )
+                    .toList(),
+              );
+            }),
           ],
         ),
       ),
@@ -138,14 +173,12 @@ class LaporanContentWidget extends StatelessWidget {
     ReportDetailDialog.show(context, report);
   }
 
-  void _setujuiLaporan(Report report) {
-    // TODO: Implement setujui laporan
-    print('Setujui laporan: ${report.title}');
+  void _setujuiLaporan(LaporanController controller, Report report) {
+    controller.updateReportStatus(report.id, ReportStatus.selesai);
   }
 
-  void _tolakLaporan(Report report) {
-    // TODO: Implement tolak laporan
-    print('Tolak laporan: ${report.title}');
+  void _tolakLaporan(LaporanController controller, Report report) {
+    controller.updateReportStatus(report.id, ReportStatus.ditolak);
   }
 
   void _beriCatatan(BuildContext context, Report report) {
