@@ -15,7 +15,7 @@ class ReportController extends GetxController {
   var selectedArea = Rxn<Map<String, dynamic>>();
   var photoBukti = <File>[].obs;
   var descriptionController = TextEditingController();
-  
+
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -43,7 +43,8 @@ class ReportController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true && data['data'] != null) {
-          availableAreas.value = (data['data'] as List).cast<Map<String, dynamic>>();
+          availableAreas.value = (data['data'] as List)
+              .cast<Map<String, dynamic>>();
         } else {
           availableAreas.clear();
         }
@@ -78,11 +79,11 @@ class ReportController extends GetxController {
 
       if (image != null) {
         final File imageFile = File(image.path);
-        
+
         // Check file size (max 5MB)
         final int fileSizeInBytes = await imageFile.length();
         final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-        
+
         if (fileSizeInMB > 5) {
           Get.snackbar('Peringatan', 'Ukuran file tidak boleh lebih dari 5MB');
           return;
@@ -113,11 +114,11 @@ class ReportController extends GetxController {
 
       if (image != null) {
         final File imageFile = File(image.path);
-        
+
         // Check file size (max 5MB)
         final int fileSizeInBytes = await imageFile.length();
         final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-        
+
         if (fileSizeInMB > 5) {
           Get.snackbar('Peringatan', 'Ukuran file tidak boleh lebih dari 5MB');
           return;
@@ -158,7 +159,7 @@ class ReportController extends GetxController {
       isLoading.value = true;
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token == null) {
         Get.snackbar('Error', 'Data user tidak ditemukan');
         return;
@@ -199,7 +200,7 @@ class ReportController extends GetxController {
       print('Submitting emergency report...');
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
-      
+
       print('Submit response: ${response.statusCode}');
       print('Response body: $responseBody');
 

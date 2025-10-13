@@ -37,10 +37,7 @@ class ReportView extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Laporkan kejadian tak terduga yang memerlukan penanganan segera',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white70,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.white70),
             ),
             const SizedBox(height: 24),
 
@@ -78,10 +75,7 @@ class ReportView extends StatelessWidget {
                   const SizedBox(height: 4),
                   const Text(
                     'Upload foto bukti dan berikan catatan pembersihan',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
 
@@ -122,10 +116,7 @@ class ReportView extends StatelessWidget {
             const SizedBox(width: 8),
             const Text(
               'Pilih Area',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -443,9 +434,11 @@ class ReportView extends StatelessWidget {
         width: double.infinity,
         height: 50,
         child: ElevatedButton(
-          onPressed: controller.isLoading.value ? null : () {
-            controller.submitEmergencyReport();
-          },
+          onPressed: controller.isLoading.value
+              ? null
+              : () {
+                  controller.submitEmergencyReport();
+                },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF4ADE80),
             foregroundColor: Colors.white,
@@ -465,10 +458,7 @@ class ReportView extends StatelessWidget {
                 )
               : const Text(
                   'Kirim Laporan',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
         ),
       );
