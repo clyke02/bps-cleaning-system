@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import '../../../../../../data/models/report_model.dart';
-import '../../../../../../data/datasources/sample_report_data.dart';
 
 class LaporanController extends GetxController {
   // Reactive Variables
@@ -13,21 +12,29 @@ class LaporanController extends GetxController {
   // Filtered reports based on search and status
   List<Report> get filteredReports {
     var filtered = reportList.toList();
-    
+
     // Filter by status
     if (selectedFilter.value != null) {
-      filtered = filtered.where((report) => report.status == selectedFilter.value).toList();
+      filtered = filtered
+          .where((report) => report.status == selectedFilter.value)
+          .toList();
     }
-    
+
     // Filter by search query
     if (searchQuery.value.isNotEmpty) {
       filtered = filtered.where((report) {
-        return report.title.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-               report.petugas.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-               report.status.toString().toLowerCase().contains(searchQuery.value.toLowerCase());
+        return report.title.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            ) ||
+            report.petugas.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            ) ||
+            report.status.toString().toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            );
       }).toList();
     }
-    
+
     return filtered;
   }
 
@@ -42,14 +49,10 @@ class LaporanController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      
-      // Simulate API call delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Load sample data (replace with actual API call)
-      final reports = SampleReportData.reports;
-      reportList.assignAll(reports);
-      
+
+      // TODO: Implement actual API call to get reports from backend
+      // For now, load empty list since no reports from petugas yet
+      reportList.clear();
     } catch (e) {
       errorMessage.value = 'Gagal memuat laporan: ${e.toString()}';
     } finally {
@@ -76,19 +79,22 @@ class LaporanController extends GetxController {
   Future<bool> updateReportStatus(int reportId, ReportStatus newStatus) async {
     try {
       isLoading.value = true;
-      
+
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 1000));
-      
+
       // Find and update report
-      final reportIndex = reportList.indexWhere((report) => report.id == reportId);
+      final reportIndex = reportList.indexWhere(
+        (report) => report.id == reportId,
+      );
       if (reportIndex != -1) {
-        final updatedReport = reportList[reportIndex].copyWith(status: newStatus);
+        final updatedReport = reportList[reportIndex].copyWith(
+          status: newStatus,
+        );
         reportList[reportIndex] = updatedReport;
         return true;
       }
       return false;
-      
     } catch (e) {
       errorMessage.value = 'Gagal update status: ${e.toString()}';
       return false;
@@ -101,12 +107,14 @@ class LaporanController extends GetxController {
   Future<bool> addNoteToReport(int reportId, String note) async {
     try {
       isLoading.value = true;
-      
+
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 1000));
-      
+
       // Find and update report with note
-      final reportIndex = reportList.indexWhere((report) => report.id == reportId);
+      final reportIndex = reportList.indexWhere(
+        (report) => report.id == reportId,
+      );
       if (reportIndex != -1) {
         final updatedReport = reportList[reportIndex].copyWith(
           catatanAdmin: note.isNotEmpty ? note : null,
@@ -115,7 +123,6 @@ class LaporanController extends GetxController {
         return true;
       }
       return false;
-      
     } catch (e) {
       errorMessage.value = 'Gagal menambah catatan: ${e.toString()}';
       return false;
@@ -127,10 +134,16 @@ class LaporanController extends GetxController {
   // Get weekly summary
   Map<String, int> get weeklySummary {
     final total = reportList.length;
-    final selesai = reportList.where((r) => r.status == ReportStatus.selesai).length;
-    final menunggu = reportList.where((r) => r.status == ReportStatus.menunggu).length;
-    final ditolak = reportList.where((r) => r.status == ReportStatus.ditolak).length;
-    
+    final selesai = reportList
+        .where((r) => r.status == ReportStatus.selesai)
+        .length;
+    final menunggu = reportList
+        .where((r) => r.status == ReportStatus.menunggu)
+        .length;
+    final ditolak = reportList
+        .where((r) => r.status == ReportStatus.ditolak)
+        .length;
+
     return {
       'total': total,
       'selesai': selesai,

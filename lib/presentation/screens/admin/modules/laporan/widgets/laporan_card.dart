@@ -5,22 +5,17 @@ import '../../../../../../data/models/report_model.dart';
 
 class LaporanCard extends StatelessWidget {
   final Report report;
-  
-  const LaporanCard({
-    super.key,
-    required this.report,
-  });
+
+  const LaporanCard({super.key, required this.report});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LaporanController>();
-    
+
     return Card(
       elevation: 2,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () => _showReportDetail(context),
         borderRadius: BorderRadius.circular(12),
@@ -70,44 +65,30 @@ class LaporanCard extends StatelessWidget {
                   _buildStatusChip(),
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Details Row
               Row(
                 children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: Colors.grey[500],
-                  ),
+                  Icon(Icons.calendar_today, size: 16, color: Colors.grey[500]),
                   const SizedBox(width: 4),
                   Text(
                     report.tanggal,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                   const Spacer(),
-                  Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: Colors.grey[500],
-                  ),
+                  Icon(Icons.location_on, size: 16, color: Colors.grey[500]),
                   const SizedBox(width: 4),
                   Text(
                     'Area ${report.areaId}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Action Buttons
               Row(
                 children: [
@@ -277,10 +258,7 @@ class LaporanCard extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.black87),
-            ),
+            child: Text(value, style: const TextStyle(color: Colors.black87)),
           ),
         ],
       ),

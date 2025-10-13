@@ -1,10 +1,14 @@
 import 'package:get/get.dart';
+import '../../../../../../services/api_service.dart';
 
 // Area Model
 class Area {
   final int id;
   final String name;
-  final String description;
+  final String lantai;
+  final String nomorRuangan;
+  final List<String> kebersihan;
+  final String keterangan;
   final bool isActive;
   final int reportCount;
   final DateTime createdAt;
@@ -12,16 +16,38 @@ class Area {
   Area({
     required this.id,
     required this.name,
-    required this.description,
+    required this.lantai,
+    required this.nomorRuangan,
+    required this.kebersihan,
+    required this.keterangan,
     this.isActive = true,
     this.reportCount = 0,
     required this.createdAt,
   });
 
+  String get description => keterangan; // For compatibility
+
+  factory Area.fromJson(Map<String, dynamic> json) {
+    return Area(
+      id: json['id'],
+      name: json['name'],
+      lantai: json['lantai'].toString(),
+      nomorRuangan: json['nomorRuangan'].toString(),
+      kebersihan: List<String>.from(json['kebersihan'] ?? []),
+      keterangan: json['keterangan'] ?? '',
+      isActive: json['isActive'] ?? true,
+      reportCount: json['reportCount'] ?? 0,
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+
   Area copyWith({
     int? id,
     String? name,
-    String? description,
+    String? lantai,
+    String? nomorRuangan,
+    List<String>? kebersihan,
+    String? keterangan,
     bool? isActive,
     int? reportCount,
     DateTime? createdAt,
@@ -29,7 +55,10 @@ class Area {
     return Area(
       id: id ?? this.id,
       name: name ?? this.name,
-      description: description ?? this.description,
+      lantai: lantai ?? this.lantai,
+      nomorRuangan: nomorRuangan ?? this.nomorRuangan,
+      kebersihan: kebersihan ?? this.kebersihan,
+      keterangan: keterangan ?? this.keterangan,
       isActive: isActive ?? this.isActive,
       reportCount: reportCount ?? this.reportCount,
       createdAt: createdAt ?? this.createdAt,
@@ -48,20 +77,24 @@ class AreaController extends GetxController {
   // Filtered areas based on search and status
   List<Area> get filteredAreas {
     var filtered = areaList.toList();
-    
+
     // Filter by active status
     if (showActiveOnly.value) {
       filtered = filtered.where((area) => area.isActive).toList();
     }
-    
+
     // Filter by search query
     if (searchQuery.value.isNotEmpty) {
       filtered = filtered.where((area) {
-        return area.name.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-               area.description.toLowerCase().contains(searchQuery.value.toLowerCase());
+        return area.name.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            ) ||
+            area.description.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            );
       }).toList();
     }
-    
+
     return filtered;
   }
 
@@ -76,16 +109,19 @@ class AreaController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      
-      // Simulate API call delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Load sample data (replace with actual API call)
-      final areas = _getSampleAreas();
-      areaList.assignAll(areas);
-      
+
+      // API call to get areas
+      final response = await ApiService.getAreas(search: searchQuery.value);
+
+      if (response['success']) {
+        final List<dynamic> areasData = response['data'];
+        final areas = areasData.map((json) => Area.fromJson(json)).toList();
+        areaList.assignAll(areas);
+      } else {
+        errorMessage.value = response['message'] ?? 'Failed to load areas';
+      }
     } catch (e) {
-      errorMessage.value = 'Gagal memuat area: \${e.toString()}';
+      errorMessage.value = 'Gagal memuat area: ${e.toString()}';
     } finally {
       isLoading.value = false;
     }
@@ -94,11 +130,13 @@ class AreaController extends GetxController {
   // Search functionality
   void searchAreas(String query) {
     searchQuery.value = query;
+    loadAreas(); // Reload with new search
   }
 
   // Clear search
   void clearSearch() {
     searchQuery.value = '';
+    loadAreas(); // Reload without search
   }
 
   // Toggle active filter
@@ -107,25 +145,47 @@ class AreaController extends GetxController {
   }
 
   // Add new area
-  Future<bool> addArea(String name, String description) async {
+  Future<bool> addArea(
+    String name,
+    String lantai,
+    String nomorRuangan,
+    List<String> kebersihan,
+    String keterangan,
+  ) async {
     try {
       isLoading.value = true;
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      final newArea = Area(
-        id: DateTime.now().millisecondsSinceEpoch,
+
+      print('DEBUG: Attempting to create area with data:');
+      print('Name: $name');
+      print('Lantai: $lantai');
+      print('Nomor Ruangan: $nomorRuangan');
+      print('Kebersihan: $kebersihan');
+      print('Keterangan: $keterangan');
+
+      // API call to create area
+      final response = await ApiService.createArea(
         name: name,
-        description: description,
-        createdAt: DateTime.now(),
+        lantai: lantai,
+        nomorRuangan: nomorRuangan,
+        kebersihan: kebersihan,
+        keterangan: keterangan,
       );
-      
-      areaList.add(newArea);
-      return true;
-      
+
+      print('DEBUG: API Response: $response');
+
+      if (response['success']) {
+        print('DEBUG: Area created successfully, reloading areas...');
+        // Reload areas to get updated list
+        await loadAreas();
+        return true;
+      } else {
+        print('DEBUG: API returned error: ${response['message']}');
+        errorMessage.value = response['message'] ?? 'Failed to create area';
+        return false;
+      }
     } catch (e) {
-      errorMessage.value = 'Gagal menambah area: \${e.toString()}';
+      print('DEBUG: Exception caught: $e');
+      errorMessage.value = 'Gagal menambah area: ${e.toString()}';
       return false;
     } finally {
       isLoading.value = false;
@@ -133,26 +193,37 @@ class AreaController extends GetxController {
   }
 
   // Update area
-  Future<bool> updateArea(int areaId, String name, String description) async {
+  Future<bool> updateArea(
+    int areaId,
+    String name,
+    String lantai,
+    String nomorRuangan,
+    List<String> kebersihan,
+    String keterangan,
+  ) async {
     try {
       isLoading.value = true;
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      final areaIndex = areaList.indexWhere((area) => area.id == areaId);
-      if (areaIndex != -1) {
-        final updatedArea = areaList[areaIndex].copyWith(
-          name: name,
-          description: description,
-        );
-        areaList[areaIndex] = updatedArea;
+
+      // API call to update area
+      final response = await ApiService.updateArea(
+        id: areaId,
+        name: name,
+        lantai: lantai,
+        nomorRuangan: nomorRuangan,
+        kebersihan: kebersihan,
+        keterangan: keterangan,
+      );
+
+      if (response['success']) {
+        // Reload areas to get updated list
+        await loadAreas();
         return true;
+      } else {
+        errorMessage.value = response['message'] ?? 'Failed to update area';
+        return false;
       }
-      return false;
-      
     } catch (e) {
-      errorMessage.value = 'Gagal update area: \${e.toString()}';
+      errorMessage.value = 'Gagal update area: ${e.toString()}';
       return false;
     } finally {
       isLoading.value = false;
@@ -163,10 +234,8 @@ class AreaController extends GetxController {
   Future<bool> toggleAreaStatus(int areaId) async {
     try {
       isLoading.value = true;
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
+
+      // For now, just toggle locally - can be implemented with API later
       final areaIndex = areaList.indexWhere((area) => area.id == areaId);
       if (areaIndex != -1) {
         final updatedArea = areaList[areaIndex].copyWith(
@@ -176,9 +245,8 @@ class AreaController extends GetxController {
         return true;
       }
       return false;
-      
     } catch (e) {
-      errorMessage.value = 'Gagal update status area: \${e.toString()}';
+      errorMessage.value = 'Gagal update status area: ${e.toString()}';
       return false;
     } finally {
       isLoading.value = false;
@@ -189,15 +257,20 @@ class AreaController extends GetxController {
   Future<bool> deleteArea(int areaId) async {
     try {
       isLoading.value = true;
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      areaList.removeWhere((area) => area.id == areaId);
-      return true;
-      
+
+      // API call to delete area
+      final response = await ApiService.deleteArea(areaId);
+
+      if (response['success']) {
+        // Reload areas to get updated list
+        await loadAreas();
+        return true;
+      } else {
+        errorMessage.value = response['message'] ?? 'Failed to delete area';
+        return false;
+      }
     } catch (e) {
-      errorMessage.value = 'Gagal hapus area: \${e.toString()}';
+      errorMessage.value = 'Gagal hapus area: ${e.toString()}';
       return false;
     } finally {
       isLoading.value = false;
@@ -209,61 +282,16 @@ class AreaController extends GetxController {
     final total = areaList.length;
     final active = areaList.where((area) => area.isActive).length;
     final inactive = total - active;
-    final totalReports = areaList.fold(0, (sum, area) => sum + area.reportCount);
-    
+    final totalReports = areaList.fold(
+      0,
+      (sum, area) => sum + area.reportCount,
+    );
+
     return {
       'total': total,
       'active': active,
       'inactive': inactive,
       'totalReports': totalReports,
     };
-  }
-
-  // Sample data
-  List<Area> _getSampleAreas() {
-    return [
-      Area(
-        id: 1,
-        name: 'Ruang Rapat',
-        description: 'Ruang rapat utama lantai 1',
-        reportCount: 5,
-        createdAt: DateTime.now().subtract(const Duration(days: 30)),
-      ),
-      Area(
-        id: 2,
-        name: 'Toilet',
-        description: 'Toilet umum lantai 1 dan 2',
-        reportCount: 12,
-        createdAt: DateTime.now().subtract(const Duration(days: 25)),
-      ),
-      Area(
-        id: 3,
-        name: 'Dapur',
-        description: 'Dapur kantin dan pantry',
-        reportCount: 8,
-        createdAt: DateTime.now().subtract(const Duration(days: 20)),
-      ),
-      Area(
-        id: 4,
-        name: 'Mushola',
-        description: 'Mushola kantor lantai 3',
-        reportCount: 3,
-        createdAt: DateTime.now().subtract(const Duration(days: 15)),
-      ),
-      Area(
-        id: 5,
-        name: 'Lobby Utama',
-        description: 'Area lobby dan resepsionis',
-        reportCount: 15,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-      ),
-      Area(
-        id: 6,
-        name: 'Ruang Meeting',
-        description: 'Ruang meeting lantai 2',
-        reportCount: 7,
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-    ];
   }
 }

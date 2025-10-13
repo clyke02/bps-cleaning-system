@@ -9,14 +9,12 @@ class LaporanFilterTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LaporanController>();
-    
+
     return Container(
       height: 60,
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey, width: 0.2),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey, width: 0.2)),
       ),
       child: ListView(
         scrollDirection: Axis.horizontal,
@@ -34,10 +32,14 @@ class LaporanFilterTabs extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip(String label, ReportStatus? status, LaporanController controller) {
+  Widget _buildFilterChip(
+    String label,
+    ReportStatus? status,
+    LaporanController controller,
+  ) {
     return Obx(() {
       final isSelected = controller.selectedFilter.value == status;
-      
+
       return FilterChip(
         label: Text(
           label,

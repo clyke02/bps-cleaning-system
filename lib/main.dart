@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'presentation/screens/auth/login_page.dart';
 import 'presentation/screens/admin/admin_dashboard.dart';
-import 'presentation/screens/user/user_dashboard.dart';
+import 'presentation/screens/user/views/user_dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'BPS Cleaning System',
       theme: ThemeData(
         primarySwatch: Colors.blue,

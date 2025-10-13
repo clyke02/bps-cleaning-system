@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/area_controller.dart';
+import 'area_add_dialog.dart';
 
 class AreaCard extends StatelessWidget {
   final Area area;
-  
-  const AreaCard({
-    super.key,
-    required this.area,
-  });
+
+  const AreaCard({super.key, required this.area});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AreaController>();
-    
+
     return Card(
       elevation: 2,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -62,44 +58,30 @@ class AreaCard extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Statistics Row
             Row(
               children: [
-                Icon(
-                  Icons.assignment,
-                  size: 16,
-                  color: Colors.grey[500],
-                ),
+                Icon(Icons.assignment, size: 16, color: Colors.grey[500]),
                 const SizedBox(width: 4),
                 Text(
                   '${area.reportCount} Laporan',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
                 const Spacer(),
-                Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: Colors.grey[500],
-                ),
+                Icon(Icons.calendar_today, size: 16, color: Colors.grey[500]),
                 const SizedBox(width: 4),
                 Text(
                   _formatDate(area.createdAt),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Action Buttons
             Row(
               children: [
@@ -123,7 +105,9 @@ class AreaCard extends StatelessWidget {
                     ),
                     label: Text(area.isActive ? 'Nonaktifkan' : 'Aktifkan'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: area.isActive ? Colors.orange[600] : Colors.green[600],
+                      backgroundColor: area.isActive
+                          ? Colors.orange[600]
+                          : Colors.green[600],
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
@@ -147,10 +131,14 @@ class AreaCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: area.isActive ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+        color: area.isActive
+            ? Colors.green.withOpacity(0.1)
+            : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: area.isActive ? Colors.green.withOpacity(0.3) : Colors.grey.withOpacity(0.3),
+          color: area.isActive
+              ? Colors.green.withOpacity(0.3)
+              : Colors.grey.withOpacity(0.3),
         ),
       ),
       child: Row(
@@ -177,68 +165,27 @@ class AreaCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   void _showEditDialog(BuildContext context, AreaController controller) {
-    final nameController = TextEditingController(text: area.name);
-    final descController = TextEditingController(text: area.description);
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Area'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nama Area',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descController,
-              decoration: const InputDecoration(
-                labelText: 'Deskripsi',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameController.text.trim().isNotEmpty) {
-                final success = await controller.updateArea(
-                  area.id,
-                  nameController.text.trim(),
-                  descController.text.trim(),
-                );
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  if (success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Area berhasil diupdate')),
-                    );
-                  }
-                }
-              }
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
+      builder: (context) =>
+          TambahAreaDialog(controller: controller, area: area),
     );
   }
 
@@ -263,7 +210,9 @@ class AreaCard extends StatelessWidget {
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Area berhasil ${area.isActive ? 'dinonaktifkan' : 'diaktifkan'}'),
+                      content: Text(
+                        'Area berhasil ${area.isActive ? 'dinonaktifkan' : 'diaktifkan'}',
+                      ),
                     ),
                   );
                 }
@@ -285,7 +234,9 @@ class AreaCard extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Hapus Area'),
-        content: Text('Apakah Anda yakin ingin menghapus area "${area.name}"? Tindakan ini tidak dapat dibatalkan.'),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus area "${area.name}"? Tindakan ini tidak dapat dibatalkan.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

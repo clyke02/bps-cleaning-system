@@ -8,7 +8,7 @@ class AreaSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AreaController>();
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey[50],
@@ -22,7 +22,10 @@ class AreaSearchBar extends StatelessWidget {
           hintStyle: TextStyle(color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
           suffixIcon: Obx(() {
             if (controller.searchQuery.value.isNotEmpty) {
               return IconButton(

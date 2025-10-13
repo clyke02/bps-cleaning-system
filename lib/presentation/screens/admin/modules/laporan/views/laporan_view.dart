@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/laporan_controller.dart';
 import '../../../../../../shared/widgets/ringkasan_widget.dart';
-import '../../../widgets/report_card.dart';
-import '../../../widgets/report_detail_dialog.dart';
-import '../../../widgets/add_catatan_dialog.dart';
+import '../widgets/report_card.dart';
+import '../widgets/report_detail_dialog.dart';
+import '../widgets/add_catatan_dialog.dart';
 import '../../../../../../data/models/report_model.dart';
-
 
 class LaporanView extends StatelessWidget {
   final Map<String, int>? weeklySummary;
@@ -16,7 +15,7 @@ class LaporanView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(LaporanController());
-    
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -32,10 +31,7 @@ class LaporanView extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           // RINGKASAN MINGGU INI
-          RingkasanWidget(
-            weeklySummary: weeklySummary ?? 
-            {'total': 12, 'selesai': 7, 'menunggu': 3, 'ditolak': 2}
-          ),
+          Obx(() => RingkasanWidget(weeklySummary: controller.weeklySummary)),
 
           // SEARCH DAN LIST LAPORAN
           _buildReportsList(context, controller),
@@ -134,14 +130,38 @@ class LaporanView extends StatelessWidget {
               }
 
               final reports = controller.filteredReports;
-              
+
               if (reports.isEmpty) {
-                return const Center(
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      'Tidak ada laporan ditemukan',
-                      style: TextStyle(color: Colors.grey),
+                    padding: const EdgeInsets.all(40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.assignment_outlined,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Belum Ada Laporan',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Laporan dari petugas akan muncul di sini',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -152,10 +172,13 @@ class LaporanView extends StatelessWidget {
                     .map(
                       (report) => ReportCard(
                         report: report,
-                        onDetailPressed: () => _showReportDetail(context, report),
-                        onSetujuPressed: () => _setujuiLaporan(controller, report),
+                        onDetailPressed: () =>
+                            _showReportDetail(context, report),
+                        onSetujuPressed: () =>
+                            _setujuiLaporan(controller, report),
                         onTolakPressed: () => _tolakLaporan(controller, report),
-                        onBeriCatatanPressed: () => _beriCatatan(context, report),
+                        onBeriCatatanPressed: () =>
+                            _beriCatatan(context, report),
                         onDownloadPressed: () => _downloadLaporan(report),
                       ),
                     )

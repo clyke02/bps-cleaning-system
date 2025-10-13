@@ -8,10 +8,10 @@ class AreaStatistics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AreaController>();
-    
+
     return Obx(() {
       final stats = controller.areaStatistics;
-      
+
       return Row(
         children: [
           Expanded(
@@ -54,7 +54,12 @@ class AreaStatistics extends StatelessWidget {
     });
   }
 
-  Widget _buildStatCard(String title, String value, Color color, IconData icon) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

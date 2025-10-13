@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_navbar.dart';
 import 'widgets/pengaturan_content.dart';
-import 'modules/petugas/views/petugas_view.dart';
 import 'modules/laporan/views/laporan_view.dart';
 import 'modules/area/views/area_view.dart';
-import '../../../data/datasources/sample_report_data.dart';
+import 'modules/petugas/views/petugas_view.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -17,7 +16,6 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int _selectedIndex = 0;
   String _userName = 'Admin'; // Default fallback
-  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -32,31 +30,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       setState(() {
         _userName = userName;
       });
-    }
-  }
-
-  Future<void> _handleLogout() async {
-    setState(() {
-      _isLoggingOut = true;
-    });
-
-    try {
-      // Clear user data from SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-
-      // Navigate to login
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-      }
-    } catch (e) {
-      print('Error during logout: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoggingOut = false;
-        });
-      }
     }
   }
 
@@ -149,10 +122,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ],
           ),
           const Spacer(),
-          // Profile dan tombol keluar
+          // Profile dan Notifikasi section
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Profile container
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
@@ -205,34 +179,34 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       ),
                     ),
                     const SizedBox(width: 8),
+                    // Tombol Notifikasi (ganti dari logout)
                     GestureDetector(
-                      onTap: _isLoggingOut ? null : _handleLogout,
+                      onTap: () {
+                        // TODO: Implement notifications
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Notifikasi akan diimplementasi'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
                       child: Container(
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.red.shade50,
+                          color: Colors.blue.shade50,
                           border: Border.all(
-                            color: Colors.red.shade200,
+                            color: Colors.blue.shade200,
                             width: 1,
                           ),
                         ),
                         child: Center(
-                          child: _isLoggingOut
-                              ? SizedBox(
-                                  width: 12,
-                                  height: 12,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.red.shade600,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.logout,
-                                  size: 14,
-                                  color: Colors.red.shade600,
-                                ),
+                          child: Icon(
+                            Icons.notifications_outlined,
+                            size: 14,
+                            color: Colors.blue.shade600,
+                          ),
                         ),
                       ),
                     ),
@@ -249,17 +223,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildContent() {
     switch (_selectedIndex) {
       case 0:
-        return LaporanView(weeklySummary: SampleReportData.weeklySummary);
+        return const LaporanView();
       case 1:
-        return PetugasView(weeklySummary: SampleReportData.weeklySummary);
+        return const PetugasView();
       case 2:
-        return AreaView(weeklySummary: SampleReportData.weeklySummary);
+        return const AreaView();
       case 3:
-        return PengaturanContentWidget(
-          weeklySummary: SampleReportData.weeklySummary,
-        );
+        return const PengaturanContent();
       default:
-        return LaporanView(weeklySummary: SampleReportData.weeklySummary);
+        return const LaporanView();
     }
   }
 }

@@ -8,10 +8,10 @@ class LaporanStatistics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LaporanController>();
-    
+
     return Obx(() {
       final summary = controller.weeklySummary;
-      
+
       return Row(
         children: [
           Expanded(
@@ -54,7 +54,12 @@ class LaporanStatistics extends StatelessWidget {
     });
   }
 
-  Widget _buildStatCard(String title, String value, Color color, IconData icon) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

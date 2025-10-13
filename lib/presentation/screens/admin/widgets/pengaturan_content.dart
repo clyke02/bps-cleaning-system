@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 import '../../../../shared/widgets/ringkasan_widget.dart';
 
-class PengaturanContentWidget extends StatefulWidget {
+class PengaturanContent extends StatefulWidget {
   final Map<String, int>? weeklySummary;
 
-  const PengaturanContentWidget({Key? key, this.weeklySummary})
-    : super(key: key);
+  const PengaturanContent({Key? key, this.weeklySummary}) : super(key: key);
 
   @override
-  State<PengaturanContentWidget> createState() =>
-      _PengaturanContentWidgetState();
+  State<PengaturanContent> createState() => _PengaturanContentState();
 }
 
-class _PengaturanContentWidgetState extends State<PengaturanContentWidget> {
+class _PengaturanContentState extends State<PengaturanContent> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,7 +34,7 @@ class _PengaturanContentWidgetState extends State<PengaturanContentWidget> {
             RingkasanWidget(
               weeklySummary:
                   widget.weeklySummary ??
-                  {'total': 12, 'selesai': 7, 'menunggu': 3, 'ditolak': 2},
+                  {'total': 0, 'selesai': 0, 'menunggu': 0, 'ditolak': 0},
             ),
 
             // Pengaturan Sistem Section
@@ -105,6 +105,8 @@ class _PengaturanContentWidgetState extends State<PengaturanContentWidget> {
                     title: 'Keamanan',
                     children: [
                       _buildSecurityButton('Ganti Password', Colors.red),
+                      const SizedBox(height: 8),
+                      _buildLogoutButton(),
                     ],
                   ),
                 ],
@@ -250,5 +252,66 @@ class _PengaturanContentWidgetState extends State<PengaturanContentWidget> {
         ),
       ),
     );
+  }
+
+  Widget _buildLogoutButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: () => _showLogoutConfirmation(),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.red),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+        ),
+        child: const Text(
+          'Logout',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Logout'),
+          content: const Text('Apakah Anda yakin ingin keluar?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _performLogout();
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _performLogout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      // Navigate to login and clear all previous routes
+      Get.offAllNamed('/login');
+    } catch (e) {
+      print('Logout error: ${e.toString()}');
+      // Still navigate even if there's an error clearing prefs
+      Get.offAllNamed('/login');
+    }
   }
 }

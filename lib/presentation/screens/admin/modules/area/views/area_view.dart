@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/area_controller.dart';
 import '../../../../../../shared/widgets/ringkasan_widget.dart';
+import '../widgets/area_add_dialog.dart';
 
 class AreaView extends StatelessWidget {
   final Map<String, int>? weeklySummary;
@@ -11,7 +12,7 @@ class AreaView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AreaController());
-    
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -29,8 +30,9 @@ class AreaView extends StatelessWidget {
           children: [
             // Ringkasan Mingguan Card
             RingkasanWidget(
-              weeklySummary: weeklySummary ??
-              {'total': 12, 'selesai': 7, 'menunggu': 3, 'ditolak': 2},
+              weeklySummary:
+                  weeklySummary ??
+                  {'total': 0, 'selesai': 0, 'menunggu': 0, 'ditolak': 0},
             ),
 
             // Manajemen Area Section
@@ -107,7 +109,7 @@ class AreaView extends StatelessWidget {
               }
 
               final areas = controller.filteredAreas;
-              
+
               if (areas.isEmpty) {
                 return const Center(
                   child: Padding(
@@ -121,7 +123,9 @@ class AreaView extends StatelessWidget {
               }
 
               return Column(
-                children: areas.map((area) => _buildAreaCard(context, area, controller)).toList(),
+                children: areas
+                    .map((area) => _buildAreaCard(context, area, controller))
+                    .toList(),
               );
             }),
           ],
@@ -130,7 +134,11 @@ class AreaView extends StatelessWidget {
     );
   }
 
-  Widget _buildAreaCard(BuildContext context, Area area, AreaController controller) {
+  Widget _buildAreaCard(
+    BuildContext context,
+    Area area,
+    AreaController controller,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -207,81 +215,29 @@ class AreaView extends StatelessWidget {
   }
 
   void _showAddAreaDialog(BuildContext context, AreaController controller) {
-    _showAreaDialog(context, controller, null);
-  }
-
-  void _showEditAreaDialog(BuildContext context, Area area, AreaController controller) {
-    _showAreaDialog(context, controller, area);
-  }
-
-  void _showAreaDialog(BuildContext context, AreaController controller, Area? area) {
-    final nameController = TextEditingController(text: area?.name ?? '');
-    final descController = TextEditingController(text: area?.description ?? '');
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(area == null ? 'Tambah Area Baru' : 'Edit Area'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nama Area',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descController,
-              decoration: const InputDecoration(
-                labelText: 'Deskripsi',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameController.text.trim().isNotEmpty) {
-                bool success;
-                if (area == null) {
-                  success = await controller.addArea(
-                    nameController.text.trim(),
-                    descController.text.trim(),
-                  );
-                } else {
-                  success = await controller.updateArea(
-                    area.id,
-                    nameController.text.trim(),
-                    descController.text.trim(),
-                  );
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  if (success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Area berhasil ${area == null ? 'ditambahkan' : 'diupdate'}')),
-                    );
-                  }
-                }
-              }
-            },
-            child: Text(area == null ? 'Tambah' : 'Simpan'),
-          ),
-        ],
-      ),
+      builder: (context) => TambahAreaDialog(controller: controller),
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Area area, AreaController controller) {
+  void _showEditAreaDialog(
+    BuildContext context,
+    Area area,
+    AreaController controller,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          TambahAreaDialog(controller: controller, area: area),
+    );
+  }
+
+  void _showDeleteDialog(
+    BuildContext context,
+    Area area,
+    AreaController controller,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

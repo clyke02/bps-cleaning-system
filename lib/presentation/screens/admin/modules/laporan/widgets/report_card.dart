@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../data/models/report_model.dart';
+import '../../../../../../data/models/report_model.dart';
 
 class ReportCard extends StatelessWidget {
   final Report report;

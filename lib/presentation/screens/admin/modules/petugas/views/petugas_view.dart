@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../controllers/petugas_controller.dart';
 import '../widgets/petugas_list_widget.dart';
 import '../widgets/tambah_petugas_dialog.dart';
-import '../../../../../../shared/widgets/ringkasan_widget.dart';
 
 class PetugasView extends StatelessWidget {
   final Map<String, int>? weeklySummary;
@@ -13,7 +12,7 @@ class PetugasView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize controller
-    Get.put(PetugasController());
+    final controller = Get.put(PetugasController());
 
     return Container(
       decoration: const BoxDecoration(
@@ -30,12 +29,11 @@ class PetugasView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Ringkasan Mingguan Card (DESIGN ASLI)
-            RingkasanWidget(
-              weeklySummary:
-                  weeklySummary ??
-                  {'total': 12, 'selesai': 7, 'menunggu': 3, 'ditolak': 2},
-            ),
+            // Ringkasan Statistik Petugas Card
+            Obx(() {
+              final stats = controller.weeklySummary;
+              return _buildPetugasStatsCard(stats);
+            }),
 
             // Manajemen Petugas Section (DESIGN ASLI)
             Padding(
@@ -115,6 +113,111 @@ class PetugasView extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  Widget _buildPetugasStatsCard(Map<String, int> stats) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 16, bottom: 20),
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Ringkasan Mingguan",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildStatsItem(
+                    count: "${stats['total_petugas'] ?? 0}",
+                    label: "Petugas",
+                    color: const Color(0xFF388E3C),
+                  ),
+                  _buildStatsItem(
+                    count: "${stats['total_admin'] ?? 0}",
+                    label: "Admin",
+                    color: const Color(0xFFF39C12),
+                  ),
+                  _buildStatsItem(
+                    count: "${stats['total_all'] ?? 0}",
+                    label: "Total",
+                    color: const Color(0xFF2196F3),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsItem({
+    required String count,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.25), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.15),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            count,
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              height: 1.0,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              height: 1.0,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
