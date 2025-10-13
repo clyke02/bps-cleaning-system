@@ -1,18 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:io';
+import '../config/environment.dart';
 
 class ApiService {
-  // Use different baseUrl for Android emulator vs real device/web
-  static String get baseUrl {
-    if (Platform.isAndroid) {
-      // For Android emulator, use 10.0.2.2 to access host machine
-      return 'http://10.0.2.2:8000/api';
-    } else {
-      // For iOS simulator, web, or real devices use localhost
-      return 'http://127.0.0.1:8000/api';
-    }
-  }
+  // Use Environment config for baseUrl
+  static String get baseUrl => Environment.baseUrl;
 
   // Areas endpoints
   static Future<Map<String, dynamic>> getAreas({String? search}) async {

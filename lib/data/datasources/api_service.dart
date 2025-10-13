@@ -2,16 +2,11 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import '../../config/environment.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android Emulator to access localhost on host machine
-  // Use 127.0.0.1 for iOS Simulator or physical devices on same network
-  // Untuk device fisik di jaringan yang sama
-  // static const String baseUrl = 'http://192.168.x.x:8000/api';
-
-  // Untuk iOS Simulator
-  // static const String baseUrl = 'http://127.0.0.1:8000/api';
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  // Use Environment config for baseUrl (auto-detect emulator vs device)
+  static String get baseUrl => Environment.baseUrl;
 
   // Headers untuk request
   static Map<String, String> get headers => {
@@ -46,7 +41,7 @@ class ApiService {
   // Get all users (staff)
   static Future<List<Map<String, dynamic>>> getUsers() async {
     const String method = 'GET';
-    const String url = '$baseUrl/users';
+    final String url = '$baseUrl/users';
 
     try {
       _logRequest(method, url, null);
@@ -177,7 +172,7 @@ class ApiService {
     required String password,
   }) async {
     const String method = 'POST';
-    const String url = '$baseUrl/login';
+    final String url = '$baseUrl/login';
     final Map<String, dynamic> body = {
       'username': username,
       'password': password,

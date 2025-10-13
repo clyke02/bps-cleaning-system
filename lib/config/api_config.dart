@@ -1,6 +1,8 @@
+import 'environment.dart';
+
 class ApiConfig {
-  // Base URL untuk API Laravel
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  // Base URL untuk API Laravel - menggunakan Environment configuration
+  static String get baseUrl => Environment.baseUrl;
 
   // Default headers untuk semua request
   static Map<String, String> get defaultHeaders => {

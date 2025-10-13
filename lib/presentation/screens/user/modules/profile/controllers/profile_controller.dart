@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../home/controllers/home_controller.dart';
 
 class ProfileController extends GetxController {
   var userName = 'User'.obs;
@@ -62,6 +63,11 @@ class ProfileController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
+
+      // Clear home data saat logout
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().clearData();
+      }
 
       // Navigate to login and clear all previous routes
       Get.offAllNamed('/login');

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 import '../user_navbar.dart';
 import '../modules/home/views/home_view.dart';
-import '../modules/report/views/report_view.dart';
+import '../modules/laporanDarurat/views/report_view.dart';
 import '../modules/riwayat/views/riwayat_view.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/home/controllers/home_controller.dart';
 
 class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
@@ -21,6 +23,13 @@ class _UserDashboardState extends State<UserDashboard> {
   void initState() {
     super.initState();
     _loadUserData();
+
+    // Auto refresh home data saat dashboard dibuka
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().refreshData();
+      }
+    });
   }
 
   Future<void> _loadUserData() async {
@@ -51,6 +60,14 @@ class _UserDashboardState extends State<UserDashboard> {
           setState(() {
             _selectedIndex = index;
           });
+
+          // Auto refresh data ketika kembali ke home
+          if (index == 0) {
+            // Home tab
+            if (Get.isRegistered<HomeController>()) {
+              Get.find<HomeController>().refreshData();
+            }
+          }
         },
       ),
     );
