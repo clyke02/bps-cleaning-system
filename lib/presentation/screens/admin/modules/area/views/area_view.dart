@@ -29,11 +29,7 @@ class AreaView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Ringkasan Mingguan Card
-            RingkasanWidget(
-              weeklySummary:
-                  weeklySummary ??
-                  {'total': 0, 'selesai': 0, 'menunggu': 0, 'ditolak': 0},
-            ),
+            const RingkasanWidget(),
 
             // Manajemen Area Section
             _buildAreaManagement(context, controller),

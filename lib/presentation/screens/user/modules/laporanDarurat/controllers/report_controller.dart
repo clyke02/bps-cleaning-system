@@ -43,8 +43,23 @@ class ReportController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true && data['data'] != null) {
-          availableAreas.value = (data['data'] as List)
+          // Remove duplicates based on area id
+          final List<Map<String, dynamic>> areas = (data['data'] as List)
               .cast<Map<String, dynamic>>();
+
+          // Use a Set to track unique IDs and filter duplicates
+          final seenIds = <int>{};
+          final uniqueAreas = areas.where((area) {
+            final id = area['id'] as int;
+            if (seenIds.contains(id)) {
+              return false; // Skip duplicate
+            }
+            seenIds.add(id);
+            return true;
+          }).toList();
+
+          availableAreas.value = uniqueAreas;
+          print('✅ Loaded ${uniqueAreas.length} unique areas');
         } else {
           availableAreas.clear();
         }
@@ -158,10 +173,17 @@ class ReportController extends GetxController {
     try {
       isLoading.value = true;
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = prefs.getString(
+        'auth_token',
+      ); // FIX: gunakan key yang benar
+      final userId = prefs.getInt('user_id');
+      final userName = prefs.getString('user_name');
 
-      if (token == null) {
-        Get.snackbar('Error', 'Data user tidak ditemukan');
+      if (token == null || userId == null) {
+        Get.snackbar(
+          'Error',
+          'Data user tidak ditemukan. Silakan login kembali.',
+        );
         return;
       }
 
@@ -181,7 +203,10 @@ class ReportController extends GetxController {
 
       // Add form fields
       request.fields.addAll({
+        'user_id': userId.toString(),
+        'user_name': userName ?? 'Unknown',
         'area_id': area['id'].toString(),
+        'area_name': area['name'] ?? '',
         'lantai': area['lantai']?.toString() ?? '',
         'no_ruangan': area['nomorRuangan']?.toString() ?? '',
         'catatan': descriptionController.text.trim(),

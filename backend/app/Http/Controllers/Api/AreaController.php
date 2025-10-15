@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Area;
 use App\Models\AreaCleaningTask;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class AreaController extends Controller
 {
@@ -338,12 +340,39 @@ class AreaController extends Controller
     public function getWeeklySummary(): JsonResponse
     {
         try {
-            // Get reports from this week (assuming we have CleaningReport model)
-            // For now, return dummy data since we don't have the reports table yet
+            // Get current week's date range
+            $startOfWeek = Carbon::now()->startOfWeek();
+            $endOfWeek = Carbon::now()->endOfWeek();
+
+            // Count reports by status for this week
+            $selesai = Report::where('status', 'approved')
+                ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                ->count();
+
+            $menunggu = Report::where('status', 'pending')
+                ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                ->count();
+
+            $ditolak = Report::where('status', 'rejected')
+                ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                ->count();
+
+            // Also get all-time counts for debugging
+            $selesaiTotal = Report::where('status', 'approved')->count();
+            $menungguTotal = Report::where('status', 'pending')->count();
+            $ditolakTotal = Report::where('status', 'rejected')->count();
+
             $weeklySummary = [
-                'Selesai' => 7,
-                'Menunggu' => 3,
-                'Ditolak' => 2,
+                'selesai' => $selesai,
+                'menunggu' => $menunggu,
+                'ditolak' => $ditolak,
+                'debug' => [
+                    'start_of_week' => $startOfWeek->toDateTimeString(),
+                    'end_of_week' => $endOfWeek->toDateTimeString(),
+                    'total_selesai' => $selesaiTotal,
+                    'total_menunggu' => $menungguTotal,
+                    'total_ditolak' => $ditolakTotal,
+                ]
             ];
 
             return response()->json([
@@ -367,78 +396,55 @@ class AreaController extends Controller
     public function getCleaningReports(): JsonResponse
     {
         try {
-            // Dummy reports data with task IDs that reference area_cleaning_tasks
-            $reportsData = [
-                [
-                    'id' => 1,
-                    'title' => 'Lantai 1 - Laporan Pembersihan - Ruang Kerja',
-                    'submission_date' => '2025-10-13T12:53:02',
-                    'status' => 'pending',
-                    'user' => [
-                        'id' => 1,
-                        'name' => 'Super Petugas'
-                    ],
-                    'area' => [
-                        'id' => 3,
-                        'name' => 'Ruang Kerja'
-                    ],
-                    'description' => 'Beres bos',
-                    'admin_notes' => null,
-                    'photos' => [],
-                    'completed_task_ids' => [5, 6], // Task IDs from area_cleaning_tasks
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'Lantai 2 - Laporan Pembersihan - Kamar Mandi',
-                    'submission_date' => '2025-10-13T14:15:00',
-                    'status' => 'pending',
-                    'user' => [
-                        'id' => 1,
-                        'name' => 'Super Petugas'
-                    ],
-                    'area' => [
-                        'id' => 5,
-                        'name' => 'Kamar Mandi'
-                    ],
-                    'description' => 'Coba di cek',
-                    'admin_notes' => null,
-                    'photos' => [],
-                    'completed_task_ids' => [1, 2, 3], // Task IDs from area_cleaning_tasks
-                ]
-            ];
+            // Get all reports with related data
+            $reports = Report::with(['user:id,name', 'area:id,name', 'photos', 'tasks.cleaningTask:id,task_name'])
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-            // Fetch actual task names from area_cleaning_tasks for each report
-            $reports = [];
-            foreach ($reportsData as $reportData) {
-                $taskIds = $reportData['completed_task_ids'];
-                
-                // Get actual task names from area_cleaning_tasks table
-                $tasks = AreaCleaningTask::whereIn('id', $taskIds)->get(['id', 'task_name']);
-                
-                $reportData['tasks'] = $tasks->map(function ($task) {
-                    return [
-                        'id' => $task->id,
-                        'task_name' => $task->task_name,
-                        'is_completed' => true
-                    ];
-                })->toArray();
-                
-                // Remove completed_task_ids as it's now in tasks array
-                unset($reportData['completed_task_ids']);
-                
-                $reports[] = $reportData;
-            }
+            // Format the reports data
+            $formattedReports = $reports->map(function ($report) {
+                return [
+                    'id' => $report->id,
+                    'title' => $report->title,
+                    'submission_date' => $report->created_at->format('Y-m-d\TH:i:s'),
+                    'status' => $report->status,
+                    'user' => [
+                        'id' => $report->user->id,
+                        'name' => $report->user->name,
+                    ],
+                    'area' => [
+                        'id' => $report->area->id,
+                        'name' => $report->area->name,
+                    ],
+                    'description' => $report->description ?? '',
+                    'admin_notes' => $report->admin_notes,
+                    'photos' => $report->photos->map(function ($photo) {
+                        return [
+                            'id' => $photo->id,
+                            'url' => $photo->photo_url,
+                            'order' => $photo->order,
+                        ];
+                    })->toArray(),
+                    'tasks' => $report->tasks->map(function ($task) {
+                        return [
+                            'id' => $task->cleaning_task_id,
+                            'task_name' => $task->cleaningTask->task_name ?? 'Unknown Task',
+                            'is_completed' => true,
+                        ];
+                    })->toArray(),
+                ];
+            });
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cleaning reports retrieved successfully',
-                'data' => $reports
+                'message' => 'Reports retrieved successfully',
+                'data' => $formattedReports
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve cleaning reports',
+                'message' => 'Failed to retrieve reports',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -493,7 +499,7 @@ class AreaController extends Controller
     public function submitEmergencyReport(Request $request)
     {
         try {
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'area_id' => 'required|exists:areas,id',
                 'lantai' => 'required|string',
                 'no_ruangan' => 'required|string',
@@ -502,18 +508,56 @@ class AreaController extends Controller
                 'photos.*' => 'file|mimes:jpeg,png,jpg|max:5120' // 5MB max
             ]);
 
-            // For now, we'll return success as emergency reports would need a separate table
-            // In production, you'd want to create an emergency_reports table and store the data
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak valid',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Get user_id from request or use default for testing
+            $userId = $request->input('user_id', 1); // TODO: Get from auth
+
+            // Create emergency report in reports table
+            $report = Report::create([
+                'area_id' => $request->area_id,
+                'user_id' => $userId,
+                'title' => 'Laporan Darurat - ' . ($request->area_name ?? 'Area'),
+                'description' => $request->catatan,
+                'status' => 'pending', // Emergency reports start as pending
+                'submission_date' => now(),
+            ]);
+
+            // Handle photo uploads
+            if ($request->hasFile('photos')) {
+                $photos = $request->file('photos');
+                foreach ($photos as $index => $photo) {
+                    // Store photo in storage/app/public/reports
+                    $path = $photo->store('reports', 'public');
+                    
+                    // Save to report_photos table
+                    \App\Models\ReportPhoto::create([
+                        'report_id' => $report->id,
+                        'photo_path' => $path,
+                        'original_name' => $photo->getClientOriginalName(),
+                        'file_size' => $photo->getSize(),
+                        'mime_type' => $photo->getMimeType(),
+                        'order' => $index + 1,
+                    ]);
+                }
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Laporan darurat berhasil dikirim',
+                'message' => 'Laporan darurat berhasil dikirim dan tersimpan',
                 'data' => [
-                    'area_id' => $request->area_id,
-                    'lantai' => $request->lantai,
-                    'no_ruangan' => $request->no_ruangan,
-                    'catatan' => $request->catatan,
+                    'report_id' => $report->id,
+                    'area_id' => $report->area_id,
+                    'title' => $report->title,
+                    'status' => $report->status,
                     'photos_count' => $request->hasFile('photos') ? count($request->file('photos')) : 0,
-                    'submitted_at' => now()->format('Y-m-d H:i:s')
+                    'submitted_at' => $report->created_at->format('Y-m-d H:i:s')
                 ]
             ]);
 
@@ -527,6 +571,61 @@ class AreaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get reports for specific user (for user's riwayat/history)
+     */
+    public function getUserReports($userId): JsonResponse
+    {
+        try {
+            // Get all reports from specific user with related data
+            $reports = Report::with(['user:id,name', 'area:id,name', 'photos'])
+                ->where('user_id', $userId)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Format the reports data
+            $formattedReports = $reports->map(function ($report) {
+                return [
+                    'id' => $report->id,
+                    'title' => $report->title,
+                    'submission_date' => $report->created_at->format('Y-m-d\TH:i:s'),
+                    'status' => $report->status,
+                    'user' => [
+                        'id' => $report->user->id,
+                        'name' => $report->user->name,
+                    ],
+                    'area' => [
+                        'id' => $report->area->id,
+                        'name' => $report->area->name,
+                    ],
+                    'description' => $report->description ?? '',
+                    'admin_notes' => $report->admin_notes,
+                    'photos' => $report->photos->map(function ($photo) {
+                        return [
+                            'id' => $photo->id,
+                            'url' => $photo->url, // Menggunakan accessor dari model
+                            'order' => $photo->order,
+                        ];
+                    })->toArray(),
+                    'created_at' => $report->created_at->format('Y-m-d\TH:i:s'),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User reports retrieved successfully',
+                'data' => $formattedReports
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve user reports',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

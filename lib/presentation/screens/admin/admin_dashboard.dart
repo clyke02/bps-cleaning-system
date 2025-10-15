@@ -7,6 +7,7 @@ import 'modules/laporan/views/laporan_view.dart';
 import 'modules/laporan/controllers/laporan_controller.dart';
 import 'modules/area/views/area_view.dart';
 import 'modules/petugas/views/petugas_view.dart';
+import 'controllers/admin_shared_controller.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -23,6 +24,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   void initState() {
     super.initState();
     _loadUserData();
+    // Initialize shared controller
+    Get.put(AdminSharedController());
   }
 
   Future<void> _loadUserData() async {
@@ -55,6 +58,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           });
 
           // Auto refresh data saat pindah tab
+          // Refresh weekly summary untuk semua tab
+          if (Get.isRegistered<AdminSharedController>()) {
+            Get.find<AdminSharedController>().refreshSummary();
+          }
+
           if (index == 0) {
             // Laporan tab - refresh reports
             if (Get.isRegistered<LaporanController>()) {

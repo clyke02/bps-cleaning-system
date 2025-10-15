@@ -20,6 +20,7 @@ Route::get('/weekly-summary', [AreaController::class, 'getWeeklySummary']);
 Route::get('/cleaning-reports', [AreaController::class, 'getCleaningReports']);
 Route::post('/cleaning-reports', [AreaController::class, 'submitCleaningReport']);
 Route::post('/emergency-reports', [AreaController::class, 'submitEmergencyReport']);
+Route::get('/user-reports/{userId}', [AreaController::class, 'getUserReports']);
 
 // Reports API routes (without auth for now)
 Route::post('/cleaning-reports', [ReportController::class, 'store']);

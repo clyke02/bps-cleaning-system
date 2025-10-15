@@ -31,10 +31,7 @@ class LaporanView extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           // RINGKASAN MINGGU INI
-          Obx(
-            () =>
-                RingkasanWidget(weeklySummary: controller.weeklySummary.value),
-          ),
+          const RingkasanWidget(),
 
           // SEARCH DAN LIST LAPORAN
           _buildReportsList(context, controller),
