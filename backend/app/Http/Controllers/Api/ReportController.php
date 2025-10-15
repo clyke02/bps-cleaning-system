@@ -52,7 +52,7 @@ class ReportController extends Controller
                 'submission_date' => now(), // Save full datetime
             ]);
 
-            // Save completed tasks with actual task names from area_cleaning_tasks
+            // Save completed tasks with cleaning_task_id reference
             $completedTaskIds = json_decode($request->completed_task_ids, true);
             if (is_array($completedTaskIds)) {
                 foreach ($completedTaskIds as $taskId) {
@@ -62,9 +62,10 @@ class ReportController extends Controller
                     if ($areaTask) {
                         ReportTask::create([
                             'report_id' => $report->id,
-                            'task_name' => $areaTask->task_name, // Use actual task name
+                            'cleaning_task_id' => $areaTask->id, // Save the cleaning_task_id
+                            'task_name' => $areaTask->task_name, // Also save task name for convenience
                             'is_completed' => true,
-                            'notes' => $areaTask->description,
+                            'notes' => null, // Notes can be added later if needed
                         ]);
                     }
                 }
@@ -92,6 +93,30 @@ class ReportController extends Controller
                 }
             }
 
+            // Update daily assignment status to 'completed' (SHARED MODE - by area only, not user)
+            // Whoever submits report first completes the assignment for ALL users
+            $today = now()->toDateString();
+            $assignment = \App\Models\DailyAssignment::where('area_id', $request->area_id)
+                ->where('assignment_date', $today)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($assignment) {
+                $assignment->update([
+                    'status' => 'completed',
+                    'report_id' => $report->id,
+                ]);
+
+                if (config('app.debug')) {
+                    \Log::info('Assignment updated to completed (shared mode)', [
+                        'assignment_id' => $assignment->id,
+                        'area_id' => $request->area_id,
+                        'completed_by_user_id' => $request->user_id,
+                        'report_id' => $report->id,
+                    ]);
+                }
+            }
+
             DB::commit();
 
             // Load relationships
@@ -102,6 +127,7 @@ class ReportController extends Controller
                 'message' => 'Laporan berhasil dikirim',
                 'data' => [
                     'id' => $report->id,
+                    'area_id' => $request->area_id,
                     'area_name' => $request->area_name,
                     'lantai' => $request->lantai,
                     'nomor_ruangan' => $request->nomor_ruangan,
@@ -109,6 +135,7 @@ class ReportController extends Controller
                     'submission_date' => $report->submission_date,
                     'photos_count' => $report->photos->count(),
                     'tasks_count' => $report->tasks->count(),
+                    'assignment_updated' => $assignment ? true : false,
                 ]
             ], 201);
 
@@ -231,6 +258,7 @@ class ReportController extends Controller
             $validator = Validator::make($request->all(), [
                 'status' => 'required|in:pending,approved,rejected',
                 'admin_notes' => 'nullable|string',
+                'rating' => 'nullable|integer|min:1|max:5',
                 'reviewed_by' => 'required|exists:users,id',
             ]);
 
@@ -247,9 +275,13 @@ class ReportController extends Controller
             $report->update([
                 'status' => $request->status,
                 'admin_notes' => $request->admin_notes,
+                'rating' => $request->rating,
                 'reviewed_by' => $request->reviewed_by,
                 'reviewed_at' => now(),
             ]);
+
+            // Load relationships for complete response
+            $report->load(['photos', 'tasks', 'area', 'user', 'reviewer']);
 
             return response()->json([
                 'success' => true,

@@ -418,10 +418,12 @@ class AreaController extends Controller
                     ],
                     'description' => $report->description ?? '',
                     'admin_notes' => $report->admin_notes,
+                    'rating' => $report->rating,
                     'photos' => $report->photos->map(function ($photo) {
+                        $baseUrl = request()->getSchemeAndHttpHost();
                         return [
                             'id' => $photo->id,
-                            'url' => $photo->photo_url,
+                            'url' => $baseUrl . '/storage/' . $photo->photo_path,
                             'order' => $photo->order,
                         ];
                     })->toArray(),
@@ -604,10 +606,12 @@ class AreaController extends Controller
                     ],
                     'description' => $report->description ?? '',
                     'admin_notes' => $report->admin_notes,
+                    'rating' => $report->rating,
                     'photos' => $report->photos->map(function ($photo) {
+                        $baseUrl = request()->getSchemeAndHttpHost();
                         return [
                             'id' => $photo->id,
-                            'url' => $photo->url, // Menggunakan accessor dari model
+                            'url' => $baseUrl . '/storage/' . $photo->photo_path,
                             'order' => $photo->order,
                         ];
                     })->toArray(),

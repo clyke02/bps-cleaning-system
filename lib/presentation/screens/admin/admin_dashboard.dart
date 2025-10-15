@@ -8,6 +8,7 @@ import 'modules/laporan/controllers/laporan_controller.dart';
 import 'modules/area/views/area_view.dart';
 import 'modules/petugas/views/petugas_view.dart';
 import 'controllers/admin_shared_controller.dart';
+import '../../../core/constants/app_styles.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -41,14 +42,92 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF5F9),
-      body: SafeArea(
-        child: Column(
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: false,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
+        title: Row(
           children: [
-            _buildHeader(),
-            Expanded(child: _buildContent()),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'BPS Sukabumi',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  'Admin Dashboard',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF4CAF50),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  _userName,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: _buildContent(),
       ),
       bottomNavigationBar: AdminNavbar(
         currentIndex: _selectedIndex,
@@ -58,7 +137,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           });
 
           // Auto refresh data saat pindah tab
-          // Refresh weekly summary untuk semua tab
           if (Get.isRegistered<AdminSharedController>()) {
             Get.find<AdminSharedController>().refreshSummary();
           }
@@ -70,170 +148,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             }
           }
         },
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Logo dan judul
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 32,
-                  height: 32,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'BPS Sukabumi',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      color: Colors.black87,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Admin Dashboard',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      height: 1.1,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Profile dan Notifikasi section
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Profile container
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(color: Colors.grey.shade300, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF4CAF50),
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.person,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _userName,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Tombol Notifikasi (ganti dari logout)
-                    GestureDetector(
-                      onTap: () {
-                        // TODO: Implement notifications
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Notifikasi akan diimplementasi'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.blue.shade50,
-                          border: Border.all(
-                            color: Colors.blue.shade200,
-                            width: 1,
-                          ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.notifications_outlined,
-                            size: 14,
-                            color: Colors.blue.shade600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

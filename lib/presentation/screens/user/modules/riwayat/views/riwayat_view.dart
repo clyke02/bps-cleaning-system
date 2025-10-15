@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/riwayat_controller.dart';
+import '../../../../../../core/constants/app_styles.dart';
 
 class RiwayatView extends StatelessWidget {
   const RiwayatView({super.key});
@@ -57,16 +58,9 @@ class RiwayatView extends StatelessWidget {
     final controller = Get.put(RiwayatController());
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF2196F3), // biru
-            Color(0xFF4ADE80), // hijau muda
-          ],
-        ),
-      ),
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
       child: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
@@ -226,7 +220,6 @@ class RiwayatView extends StatelessWidget {
         item['submission_date']?.toString() ??
         item['created_at']?.toString() ??
         '';
-    final adminNotes = item['admin_notes']?.toString();
 
     Color statusColor;
     IconData statusIcon;
@@ -375,55 +368,6 @@ class RiwayatView extends StatelessWidget {
                   ),
                 ],
 
-                // Admin Notes (jika ada)
-                if (adminNotes != null && adminNotes.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade200, width: 1),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.admin_panel_settings,
-                          size: 16,
-                          color: Colors.blue.shade700,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Catatan Admin:',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue.shade700,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                adminNotes,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.blue.shade900,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
                 // View Detail Button
                 const SizedBox(height: 12),
                 Row(
@@ -489,45 +433,6 @@ class RiwayatView extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.history_outlined,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Belum Ada Riwayat',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Riwayat laporan akan muncul di sini',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showDetailDialog(BuildContext context, Map<String, dynamic> item) {
     final status = item['status']?.toString() ?? 'pending';
     final title = item['title']?.toString() ?? 'Laporan';
@@ -538,6 +443,7 @@ class RiwayatView extends StatelessWidget {
         item['created_at']?.toString() ??
         '';
     final adminNotes = item['admin_notes']?.toString();
+    final rating = item['rating'];
     final photos = item['photos'] as List? ?? [];
 
     Color statusColor;
@@ -576,216 +482,327 @@ class RiwayatView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.transparent,
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 400),
+          constraints: const BoxConstraints(maxWidth: 450, maxHeight: 700),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF2196F3), Color(0xFF4ADE80)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
+              // Header dengan gradient
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [const Color(0xFF4CAF50), const Color(0xFF2196F3)],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         Icons.description,
                         color: Colors.white,
-                        size: 24,
+                        size: 20,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Detail Laporan',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                    const Text(
+                      'Detail Laporan',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
+                    const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
               ),
 
-              // Content
+              // Content dengan background putih
               Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Status Badge
-                      Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(25),
-                            border: Border.all(color: statusColor, width: 2),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(statusIcon, color: statusColor, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                statusText,
-                                style: TextStyle(
-                                  color: statusColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Status Badge
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(color: statusColor, width: 2),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(statusIcon, color: statusColor, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  statusText,
+                                  style: TextStyle(
+                                    color: statusColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Title
-                      _buildDetailRow(Icons.title, 'Judul', title),
-                      const SizedBox(height: 16),
-
-                      // Area
-                      _buildDetailRow(Icons.location_on, 'Area', areaName),
-                      const SizedBox(height: 16),
-
-                      // Date
-                      _buildDetailRow(
-                        Icons.calendar_today,
-                        'Tanggal',
-                        formattedDate,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Description
-                      if (description.isNotEmpty) ...[
-                        _buildDetailRow(Icons.notes, 'Deskripsi', description),
-                        const SizedBox(height: 16),
-                      ],
-
-                      // Admin Notes
-                      if (adminNotes != null && adminNotes.isNotEmpty) ...[
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.blue.shade200,
-                              width: 1.5,
+                              ],
                             ),
                           ),
-                          child: Column(
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Title
+                        _buildDetailRow(Icons.title, 'Judul', title),
+                        const SizedBox(height: 16),
+
+                        // Area
+                        _buildDetailRow(Icons.location_on, 'Area', areaName),
+                        const SizedBox(height: 16),
+
+                        // Date
+                        _buildDetailRow(
+                          Icons.calendar_today,
+                          'Tanggal',
+                          formattedDate,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Description
+                        if (description.isNotEmpty) ...[
+                          const Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.admin_panel_settings,
-                                    color: Colors.blue.shade700,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Catatan Admin',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue.shade700,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                              Icon(
+                                Icons.notes,
+                                size: 20,
+                                color: Color(0xFF4CAF50),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                adminNotes,
-                                style: TextStyle(
-                                  color: Colors.blue.shade900,
-                                  fontSize: 13,
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Deskripsi',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-
-                      // Photos
-                      if (photos.isNotEmpty) ...[
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.photo_library,
-                              color: const Color(0xFF4CAF50),
-                              size: 20,
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey.shade200),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Foto Bukti (${photos.length})',
+                            child: Text(
+                              description,
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize: 13,
+                                color: Colors.black87,
+                                height: 1.4,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Rating dari Admin
+                        if (rating != null && rating > 0) ...[
+                          const Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.star,
+                                size: 20,
+                                color: Color(0xFF4CAF50),
                               ),
-                          itemCount: photos.length,
-                          itemBuilder: (context, index) {
-                            final photoUrl = photos[index]['url'] ?? '';
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade200,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  photoUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(Icons.broken_image);
-                                  },
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Rating dari Admin',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.amber.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                ...List.generate(5, (index) {
+                                  return Icon(
+                                    index < rating
+                                        ? Icons.star
+                                        : Icons.star_border,
+                                    color: Colors.amber.shade700,
+                                    size: 22,
+                                  );
+                                }),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '$rating/5',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.amber.shade900,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Catatan Admin
+                        if (adminNotes != null && adminNotes.isNotEmpty) ...[
+                          const Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.admin_panel_settings,
+                                size: 20,
+                                color: Color(0xFF4CAF50),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Catatan Admin',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue.shade200),
+                            ),
+                            child: Text(
+                              adminNotes,
+                              style: TextStyle(
+                                color: Colors.blue.shade900,
+                                fontSize: 13,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Photos
+                        if (photos.isNotEmpty) ...[
+                          const Text(
+                            'Foto Bukti',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                ),
+                            itemCount: photos.length,
+                            itemBuilder: (context, index) {
+                              final photoUrl = photos[index]['url'] ?? '';
+                              return Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.shade200,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    photoUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(
+                                        Icons.broken_image,
+                                        color: Colors.grey.shade400,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),

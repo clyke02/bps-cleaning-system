@@ -17,6 +17,7 @@ class Report extends Model
         'status',
         'submission_date',
         'admin_notes',
+        'rating',
         'reviewed_by',
         'reviewed_at',
     ];

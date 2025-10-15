@@ -212,7 +212,7 @@ class CleaningTaskDialog extends StatelessWidget {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Checkbox(
                         value: isCompleted,
@@ -224,18 +224,15 @@ class CleaningTaskDialog extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                            task['task_name'] ?? 'Tugas ${index + 1}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              decoration: isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                              decorationColor: Colors.grey,
-                            ),
+                        child: Text(
+                          task['task_name'] ?? 'Tugas ${index + 1}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                            decoration: isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                            decorationColor: Colors.grey,
                           ),
                         ),
                       ),

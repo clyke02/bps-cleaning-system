@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/report_controller.dart';
+import '../../../../../../core/constants/app_styles.dart';
 
 class ReportView extends StatelessWidget {
   const ReportView({super.key});
@@ -10,19 +11,13 @@ class ReportView extends StatelessWidget {
     final controller = Get.put(ReportController());
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF2196F3), // biru
-            Color(0xFF4ADE80), // hijau muda
-          ],
-        ),
-      ),
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
       child: RefreshIndicator(
         onRefresh: () => controller.refreshData(),
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
           children: [
             // Header

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../../../../../../services/api_service.dart';
+import '../../../../../../data/datasources/api_service.dart';
 
 // Area Model
 class Area {
@@ -86,12 +86,8 @@ class AreaController extends GetxController {
     // Filter by search query
     if (searchQuery.value.isNotEmpty) {
       filtered = filtered.where((area) {
-        return area.name.toLowerCase().contains(
-              searchQuery.value.toLowerCase(),
-            ) ||
-            area.description.toLowerCase().contains(
-              searchQuery.value.toLowerCase(),
-            );
+        return area.name.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+            area.description.toLowerCase().contains(searchQuery.value.toLowerCase());
       }).toList();
     }
 
@@ -238,9 +234,7 @@ class AreaController extends GetxController {
       // For now, just toggle locally - can be implemented with API later
       final areaIndex = areaList.indexWhere((area) => area.id == areaId);
       if (areaIndex != -1) {
-        final updatedArea = areaList[areaIndex].copyWith(
-          isActive: !areaList[areaIndex].isActive,
-        );
+        final updatedArea = areaList[areaIndex].copyWith(isActive: !areaList[areaIndex].isActive);
         areaList[areaIndex] = updatedArea;
         return true;
       }
@@ -282,16 +276,8 @@ class AreaController extends GetxController {
     final total = areaList.length;
     final active = areaList.where((area) => area.isActive).length;
     final inactive = total - active;
-    final totalReports = areaList.fold(
-      0,
-      (sum, area) => sum + area.reportCount,
-    );
+    final totalReports = areaList.fold(0, (sum, area) => sum + area.reportCount);
 
-    return {
-      'total': total,
-      'active': active,
-      'inactive': inactive,
-      'totalReports': totalReports,
-    };
+    return {'total': total, 'active': active, 'inactive': inactive, 'totalReports': totalReports};
   }
 }

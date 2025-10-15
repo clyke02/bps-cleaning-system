@@ -11,6 +11,7 @@ class ReportTask extends Model
 
     protected $fillable = [
         'report_id',
+        'cleaning_task_id',
         'task_name',
         'is_completed',
         'notes',
@@ -23,5 +24,10 @@ class ReportTask extends Model
     public function report()
     {
         return $this->belongsTo(Report::class);
+    }
+
+    public function cleaningTask()
+    {
+        return $this->belongsTo(AreaCleaningTask::class, 'cleaning_task_id');
     }
 }

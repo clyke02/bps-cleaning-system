@@ -158,6 +158,45 @@ class UserController extends Controller
     }
 
     /**
+     * Change user password (without requiring old password - for forgot password scenario).
+     */
+    public function changePassword(Request $request, string $id): JsonResponse
+    {
+        try {
+            $user = User::findOrFail($id);
+            
+            $validator = Validator::make($request->all(), [
+                'new_password' => 'required|string|min:6',
+                'confirm_password' => 'required|string|same:new_password',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Update password directly (no old password check - for forgot password)
+            $user->update([
+                'password' => Hash::make($request->new_password)
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password berhasil diubah'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to change password',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Remove the specified user.
      */
     public function destroy(string $id): JsonResponse

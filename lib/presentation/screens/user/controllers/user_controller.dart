@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../data/models/petugas_model.dart';
+import '../../../../config/environment.dart';
 
 class UserController extends GetxController {
   // Observable variables untuk user yang login
@@ -32,18 +36,45 @@ class UserController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      // TODO: Replace with actual API call
-      // For now, use empty list since no petugas data yet
-      userList.clear();
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      if (token == null) {
+        errorMessage.value = 'Token tidak ditemukan';
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('${Environment.baseUrl}/users'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json', 'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data['success'] == true && data['data'] != null) {
+          final List<dynamic> petugasList = data['data'];
+
+          userList.value = petugasList.map((item) => Petugas.fromJson(item)).toList();
+
+          if (Environment.isDebug) {
+            print('DEBUG: Loaded ${userList.length} petugas');
+          }
+        } else {
+          userList.clear();
+        }
+      } else {
+        throw Exception('Failed to load petugas: ${response.statusCode}');
+      }
+
       _updateStatistics();
       _applyFilters();
     } catch (e) {
+      if (Environment.isDebug) {
+        print('DEBUG: Error loading petugas: $e');
+      }
       errorMessage.value = 'Gagal memuat data petugas: ${e.toString()}';
-      Get.snackbar(
-        'Error',
-        errorMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
     }
@@ -80,11 +111,7 @@ class UserController extends GetxController {
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal menambahkan petugas: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Gagal menambahkan petugas: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       isLoading.value = false;
@@ -123,11 +150,7 @@ class UserController extends GetxController {
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal memperbarui petugas: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Gagal memperbarui petugas: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       isLoading.value = false;
@@ -153,11 +176,7 @@ class UserController extends GetxController {
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal menghapus petugas: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Gagal menghapus petugas: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       isLoading.value = false;
@@ -181,11 +200,7 @@ class UserController extends GetxController {
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal memperbarui status: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Gagal memperbarui status: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
       return false;
     }
   }
@@ -241,14 +256,10 @@ class UserController extends GetxController {
   void _updateStatistics() {
     totalPetugas.value = userList.length;
     activePetugas.value = userList.where((p) => p.status == 'active').length;
-    inactivePetugas.value = userList
-        .where((p) => p.status == 'inactive')
-        .length;
+    inactivePetugas.value = userList.where((p) => p.status == 'inactive').length;
 
     if (userList.isNotEmpty) {
-      final totalCompletion = userList
-          .map((p) => p.completionRate)
-          .reduce((a, b) => a + b);
+      final totalCompletion = userList.map((p) => p.completionRate).reduce((a, b) => a + b);
       averageCompletion.value = totalCompletion / userList.length;
     } else {
       averageCompletion.value = 0.0;

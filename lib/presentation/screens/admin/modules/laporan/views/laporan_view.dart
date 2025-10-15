@@ -6,6 +6,7 @@ import '../widgets/report_card.dart';
 import '../widgets/report_detail_dialog.dart';
 import '../widgets/add_catatan_dialog.dart';
 import '../../../../../../data/models/report_model.dart';
+import '../../../../../../core/constants/app_styles.dart';
 
 class LaporanView extends StatelessWidget {
   final Map<String, int>? weeklySummary;
@@ -17,16 +18,7 @@ class LaporanView extends StatelessWidget {
     final controller = Get.put(LaporanController());
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF2196F3), // biru
-            Color(0xFF4ADE80), // hijau muda
-          ],
-        ),
-      ),
+      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -85,34 +77,87 @@ class LaporanView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // SEARCH BAR
+            // SEARCH BAR AND EXPORT BUTTON
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
-              child: TextField(
-                onChanged: controller.searchReports,
-                decoration: InputDecoration(
-                  hintText: "Cari Ruangan",
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      onChanged: controller.searchReports,
+                      decoration: InputDecoration(
+                        hintText: "Cari Ruangan",
+                        hintStyle: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF2196F3),
+                          ),
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                      ),
+                    ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  const SizedBox(width: 12),
+                  // Export PDF Button
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFE53E3E), Color(0xFFD73227)],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: controller.showWeeklyExportDialog,
+                        borderRadius: BorderRadius.circular(8),
+                        child: const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.picture_as_pdf,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Export PDF',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFF2196F3)),
-                  ),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 16,
-                  ),
-                ),
+                ],
               ),
             ),
 
@@ -197,11 +242,13 @@ class LaporanView extends StatelessWidget {
   }
 
   void _setujuiLaporan(LaporanController controller, Report report) {
-    controller.updateReportStatus(report.id.toString(), ReportStatus.selesai);
+    // Show dialog untuk rating dan catatan admin
+    _showRatingDialog(Get.context!, controller, report, 'approved');
   }
 
   void _tolakLaporan(LaporanController controller, Report report) {
-    controller.updateReportStatus(report.id.toString(), ReportStatus.ditolak);
+    // Show dialog untuk rating dan catatan admin
+    _showRatingDialog(Get.context!, controller, report, 'rejected');
   }
 
   void _beriCatatan(BuildContext context, Report report) {
@@ -212,5 +259,82 @@ class LaporanView extends StatelessWidget {
   void _downloadLaporan(Report report) {
     // TODO: Implement download functionality
     print('Download laporan: ${report.title}');
+  }
+
+  void _showRatingDialog(
+    BuildContext context,
+    LaporanController controller,
+    Report report,
+    String status,
+  ) {
+    final RxInt selectedRating = 1.obs;
+    final TextEditingController notesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(status == 'approved' ? 'Setujui Laporan' : 'Tolak Laporan'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Laporan: ${report.title}'),
+            const SizedBox(height: 16),
+
+            const Text('Rating (1-5):'),
+            const SizedBox(height: 8),
+            Obx(
+              () => Row(
+                children: List.generate(5, (index) {
+                  return GestureDetector(
+                    onTap: () => selectedRating.value = index + 1,
+                    child: Icon(
+                      index < selectedRating.value
+                          ? Icons.star
+                          : Icons.star_border,
+                      color: Colors.amber,
+                      size: 30,
+                    ),
+                  );
+                }),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            const Text('Catatan Admin:'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: notesController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Masukkan catatan untuk petugas...',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              final reportStatus = status == 'approved'
+                  ? ReportStatus.selesai
+                  : ReportStatus.ditolak;
+              controller.updateReportStatusWithNotes(
+                report.id.toString(),
+                reportStatus,
+                notesController.text,
+                selectedRating.value,
+              );
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
   }
 }

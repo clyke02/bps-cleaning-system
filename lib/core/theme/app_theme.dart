@@ -8,42 +8,55 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         brightness: Brightness.light,
+        primary: AppColors.primary,
+        secondary: AppColors.secondary,
+        error: AppColors.error,
       ),
 
-      // App Bar Theme
+      // App Bar Theme - Modern & Clean
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.white,
         foregroundColor: AppColors.textPrimary,
-        elevation: 2,
+        elevation: 0, // Flat design
+        surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
           color: AppColors.textPrimary,
           fontSize: AppSizes.fontXL,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.5,
         ),
       ),
 
-      // Card Theme
-      cardTheme: const CardThemeData(
+      // Card Theme - Modern with Subtle Shadow
+      cardTheme: CardThemeData(
         color: AppColors.cardBackground,
-        elevation: AppSizes.elevationM,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusM)),
+        elevation: 0, // Use custom shadows instead
+        shadowColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusL)),
         ),
+        margin: const EdgeInsets.all(AppSizes.paddingS),
       ),
 
-      // Elevated Button Theme
+      // Elevated Button Theme - Modern with Gradient Ready
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.white,
-          elevation: AppSizes.elevationS,
+          foregroundColor: AppColors.textOnPrimary,
+          elevation: 0,
+          shadowColor: Colors.transparent,
           minimumSize: const Size(double.infinity, AppSizes.buttonHeightL),
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusS)),
+            borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusM)),
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.paddingL,
+            vertical: AppSizes.paddingM,
           ),
           textStyle: const TextStyle(
-            fontSize: AppSizes.fontM,
+            fontSize: AppSizes.fontL,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ),
@@ -129,8 +142,8 @@ class AppTheme {
         ),
       ),
 
-      // Scaffold Background
-      scaffoldBackgroundColor: AppColors.background,
+      // Scaffold Background - Transparent untuk gradient
+      scaffoldBackgroundColor: Colors.transparent,
 
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(

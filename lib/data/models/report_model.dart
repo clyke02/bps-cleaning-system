@@ -6,6 +6,7 @@ class Report {
   final ReportStatus status;
   final String? catatanPetugas;
   final String? catatanAdmin;
+  final int? rating;
   final List<String> imagePaths;
   final int areaId;
   final List<CleaningTask> tasks;
@@ -18,6 +19,7 @@ class Report {
     required this.status,
     this.catatanPetugas,
     this.catatanAdmin,
+    this.rating,
     this.imagePaths = const [],
     required this.areaId,
     this.tasks = const [],
@@ -41,6 +43,7 @@ class Report {
     ReportStatus? status,
     String? catatanPetugas,
     String? catatanAdmin,
+    int? rating,
     List<String>? imagePaths,
     int? areaId,
     List<CleaningTask>? tasks,
@@ -53,6 +56,7 @@ class Report {
       status: status ?? this.status,
       catatanPetugas: catatanPetugas ?? this.catatanPetugas,
       catatanAdmin: catatanAdmin ?? this.catatanAdmin,
+      rating: rating ?? this.rating,
       imagePaths: imagePaths ?? this.imagePaths,
       areaId: areaId ?? this.areaId,
       tasks: tasks ?? this.tasks,
@@ -71,6 +75,7 @@ class Report {
       ),
       catatanPetugas: json['catatan_petugas'],
       catatanAdmin: json['catatan_admin'],
+      rating: json['rating'],
       imagePaths: List<String>.from(json['image_paths'] ?? []),
       areaId: json['area_id'] ?? 0,
       tasks:
@@ -90,6 +95,7 @@ class Report {
       'status': status.toString().split('.').last,
       'catatan_petugas': catatanPetugas,
       'catatan_admin': catatanAdmin,
+      'rating': rating,
       'image_paths': imagePaths,
       'area_id': areaId,
       'tasks': tasks.map((task) => task.toJson()).toList(),

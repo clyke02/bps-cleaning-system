@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
+import '../../../../../../core/constants/app_styles.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -10,16 +11,9 @@ class ProfileView extends StatelessWidget {
     final controller = Get.put(ProfileController());
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF2196F3), // biru
-            Color(0xFF4ADE80), // hijau muda
-          ],
-        ),
-      ),
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -28,37 +22,41 @@ class ProfileView extends StatelessWidget {
             // Profile Header
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Column(
                 children: [
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF4CAF50),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF2196F3), Color(0xFF4ADE80)],
+                      ),
                       border: Border.all(color: Colors.white, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
                     child: const Center(
-                      child: Icon(Icons.person, size: 40, color: Colors.white),
+                      child: Icon(Icons.person, size: 45, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -66,77 +64,94 @@ class ProfileView extends StatelessWidget {
                     () => Text(
                       controller.userName.value,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Obx(
                     () => Text(
-                      controller.userEmail.value,
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      controller.userPhone.value,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4ADE80).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Pengguna Aktif',
+                      style: TextStyle(
+                        color: const Color(0xFF16A34A),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Profile Menu
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Column(
                 children: [
                   _buildProfileMenuItem(
-                    icon: Icons.edit_outlined,
-                    title: 'Edit Profile',
-                    subtitle: 'Ubah informasi profil Anda',
-                    onTap: () {
-                      Get.snackbar(
-                        'Info',
-                        'Fitur edit profile akan segera tersedia',
-                        backgroundColor: Colors.blue,
-                        colorText: Colors.white,
-                      );
-                    },
+                    icon: Icons.person_outline,
+                    title: 'Profile Pengguna',
+                    subtitle: 'Lihat informasi profil Anda',
+                    iconColor: const Color(0xFF2196F3),
+                    onTap: () => controller.showProfileDetail(context),
                   ),
-                  const Divider(height: 1, color: Colors.grey),
+                  _buildDivider(),
                   _buildProfileMenuItem(
                     icon: Icons.lock_outline,
-                    title: 'Ganti Password',
-                    subtitle: 'Ubah kata sandi akun Anda',
-                    onTap: () {
-                      Get.snackbar(
-                        'Info',
-                        'Fitur ganti password akan segera tersedia',
-                        backgroundColor: Colors.orange,
-                        colorText: Colors.white,
-                      );
-                    },
+                    title: 'Ubah Password',
+                    subtitle: 'Ganti kata sandi akun Anda',
+                    iconColor: const Color(0xFF9C27B0),
+                    onTap: () => controller.showChangePasswordDialog(context),
                   ),
-                  const Divider(height: 1, color: Colors.grey),
+                  _buildDivider(),
+                  _buildProfileMenuItem(
+                    icon: Icons.help_outline,
+                    title: 'Panduan Aplikasi',
+                    subtitle: 'Pelajari cara menggunakan aplikasi',
+                    iconColor: const Color(0xFF4ADE80),
+                    onTap: () => controller.showAppGuide(context),
+                  ),
+                  _buildDivider(),
                   _buildProfileMenuItem(
                     icon: Icons.logout,
                     title: 'Logout',
                     subtitle: 'Keluar dari aplikasi',
-                    titleColor: Colors.red,
-                    iconColor: Colors.red,
-                    onTap: () {
-                      controller.showLogoutConfirmation(context);
-                    },
+                    titleColor: Colors.red[600],
+                    iconColor: Colors.red[600],
+                    onTap: () => controller.showLogoutConfirmation(context),
                   ),
                 ],
               ),
@@ -144,6 +159,14 @@ class ProfileView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 1,
+      color: Colors.grey[200],
     );
   }
 
@@ -155,45 +178,69 @@ class ProfileView extends StatelessWidget {
     Color? titleColor,
     Color? iconColor,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: (iconColor ?? Colors.grey).withOpacity(0.1),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (iconColor ?? const Color(0xFF2196F3)).withOpacity(
+                    0.12,
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor ?? const Color(0xFF2196F3),
+                  size: 24,
+                ),
               ),
-              child: Icon(icon, color: iconColor ?? Colors.grey[700], size: 20),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: titleColor ?? Colors.black87,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: titleColor ?? Colors.black87,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
-          ],
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey[500],
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

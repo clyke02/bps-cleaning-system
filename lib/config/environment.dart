@@ -8,8 +8,14 @@ class Environment {
   // IP Address PC Anda di jaringan lokal
   // Cara cek: Buka CMD/Terminal, ketik: ipconfig (Windows) atau ifconfig (Mac/Linux)
   // Cari IPv4 Address, contoh: 192.168.1.100
-  static const String localNetworkIP =
-      '192.168.1.100'; // ⚠️ GANTI DENGAN IP PC ANDA!
+  static const String localNetworkIP = '192.168.1.100'; // ⚠️ GANTI DENGAN IP PC ANDA!
+
+  // Debug mode detection
+  static bool get isDebug {
+    bool debugMode = false;
+    assert(debugMode = true);
+    return debugMode;
+  }
 
   // ================================
   // AUTO DETECTION
