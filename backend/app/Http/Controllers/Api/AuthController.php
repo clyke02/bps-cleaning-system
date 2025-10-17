@@ -6,38 +6,38 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        Log::info('Login attempt', ['username' => $request->username, 'origin' => $request->header('Origin')]);
+        
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $credentials['email'])->first();
+        $user = User::where('username', $request->username)->first();
 
-        if ($user && Hash::check($credentials['password'], $user->password)) {
-            $token = $user->createToken('auth_token')->plainTextToken;
-
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            Log::warning('Login failed for username: ' . $request->username);
             return response()->json([
-                'success' => true,
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                ],
-            ]);
+                'success' => false,
+                'message' => 'Invalid credentials'
+            ], 401);
         }
 
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        Log::info('Login successful for username: ' . $request->username);
         return response()->json([
-            'success' => false,
-            'message' => 'Email atau password salah',
-        ], 401);
+            'success' => true,
+            'user' => $user,
+            'token' => $token
+        ]);
     }
 
     public function logout(Request $request)
