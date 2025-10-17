@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../../home/controllers/home_controller.dart';
 import '../../../../../../core/utils/auth_helper.dart';
 import '../../../../../../config/environment.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class ProfileController extends GetxController {
   var userName = 'User'.obs;
@@ -159,8 +160,8 @@ class ProfileController extends GetxController {
                 // Header
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [Color(0xFF2196F3), Color(0xFF4ADE80)],
@@ -367,51 +368,46 @@ class ProfileController extends GetxController {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        ...guideSteps
-                            .map(
-                              (step) => Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(12),
+                        ...guideSteps.map(
+                          (step) => Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12)),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4ADE80).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(step['icon'], color: const Color(0xFF4ADE80), size: 24),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF4ADE80).withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(10),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        step['title'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
+                                        ),
                                       ),
-                                      child: Icon(step['icon'], color: const Color(0xFF4ADE80), size: 24),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            step['title'],
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            step['description'],
-                                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                                          ),
-                                        ],
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        step['description'],
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -496,22 +492,22 @@ class ProfileController extends GetxController {
   void _changePassword(BuildContext context) async {
     // Validasi input (no old password required)
     if (newPasswordController.text.isEmpty || confirmPasswordController.text.isEmpty) {
-      Get.snackbar('Error', 'Semua field harus diisi', backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.showError(title: 'Error', message: 'Semua field harus diisi');
       return;
     }
 
     if (newPasswordController.text != confirmPasswordController.text) {
-      Get.snackbar('Error', 'Konfirmasi password tidak sama', backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.showError(title: 'Error', message: 'Konfirmasi password tidak sama');
       return;
     }
 
     if (newPasswordController.text.length < 6) {
-      Get.snackbar('Error', 'Password baru minimal 6 karakter', backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.showError(title: 'Error', message: 'Password baru minimal 6 karakter');
       return;
     }
 
     if (userId.value.isEmpty) {
-      Get.snackbar('Error', 'User ID tidak ditemukan', backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.showError(title: 'Error', message: 'User ID tidak ditemukan');
       return;
     }
 
@@ -541,12 +537,7 @@ class ProfileController extends GetxController {
         confirmPasswordController.clear();
 
         // Tampilkan pesan sukses
-        Get.snackbar(
-          'Sukses',
-          responseData['message'] ?? 'Password berhasil diubah',
-          backgroundColor: const Color(0xFF4CAF50),
-          colorText: Colors.white,
-        );
+        CustomSnackbar.showSuccess(title: 'Sukses', message: responseData['message'] ?? 'Password berhasil diubah');
       } else {
         // Tampilkan error dari server
         String errorMessage = 'Gagal mengubah password';
@@ -557,10 +548,10 @@ class ProfileController extends GetxController {
           errorMessage = errors.values.first[0];
         }
 
-        Get.snackbar('Error', errorMessage, backgroundColor: Colors.red, colorText: Colors.white);
+        CustomSnackbar.showError(title: 'Error', message: errorMessage);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}', backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackbar.showError(title: 'Error', message: 'Terjadi kesalahan: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

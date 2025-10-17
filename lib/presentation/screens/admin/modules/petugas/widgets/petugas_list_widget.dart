@@ -25,11 +25,7 @@ class PetugasListWidget extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Terjadi Kesalahan',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[800]),
               ),
               const SizedBox(height: 8),
               Text(
@@ -61,11 +57,7 @@ class PetugasListWidget extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Belum Ada Data Petugas',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600]),
               ),
               const SizedBox(height: 8),
               Text(
@@ -78,11 +70,7 @@ class PetugasListWidget extends StatelessWidget {
         );
       }
 
-      return Column(
-        children: controller.staffList
-            .map((staff) => _buildStaffCard(context, staff))
-            .toList(),
-      );
+      return Column(children: controller.staffList.map((staff) => _buildStaffCard(context, staff)).toList());
     });
   }
 
@@ -94,17 +82,8 @@ class PetugasListWidget extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: 1,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 1),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 12, offset: const Offset(0, 4), spreadRadius: 1),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 1)),
         ],
         border: Border.all(color: Colors.grey.shade100),
       ),
@@ -115,19 +94,13 @@ class PetugasListWidget extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: staff.isAdmin
-                  ? const Color(0xFF2196F3)
-                  : const Color(0xFF4CAF50),
+              color: staff.isAdmin ? const Color(0xFF2196F3) : const Color(0xFF4CAF50),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Center(
               child: Text(
                 _getInitials(staff.name),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
           ),
@@ -143,23 +116,15 @@ class PetugasListWidget extends StatelessWidget {
                     Expanded(
                       child: Text(
                         staff.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: staff.isAdmin
-                            ? Colors.blue[100]
-                            : Colors.green[100],
+                        color: staff.isAdmin ? Colors.blue[100] : Colors.green[100],
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -167,9 +132,7 @@ class PetugasListWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
-                          color: staff.isAdmin
-                              ? Colors.blue[700]
-                              : Colors.green[700],
+                          color: staff.isAdmin ? Colors.blue[700] : Colors.green[700],
                         ),
                       ),
                     ),
@@ -181,10 +144,7 @@ class PetugasListWidget extends StatelessWidget {
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  '@${staff.username}',
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                ),
+                Text('@${staff.username}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
               ],
             ),
           ),
@@ -194,17 +154,10 @@ class PetugasListWidget extends StatelessWidget {
             onTap: () => _showEditPetugas(context, staff),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(12)),
               child: const Text(
                 'Edit',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -256,19 +209,14 @@ class PetugasListWidget extends StatelessWidget {
               child: const Icon(Icons.delete_outline, color: Colors.red),
             ),
             const SizedBox(width: 12),
-            const Expanded(
-              child: Text('Hapus Petugas', style: TextStyle(fontSize: 18)),
-            ),
+            const Expanded(child: Text('Hapus Petugas', style: TextStyle(fontSize: 18))),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Apakah Anda yakin ingin menghapus petugas berikut?',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text('Apakah Anda yakin ingin menghapus petugas berikut?', style: TextStyle(color: Colors.grey[600])),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -280,50 +228,29 @@ class PetugasListWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    staff.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                  Text(staff.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 4),
                   Text(staff.phone, style: TextStyle(color: Colors.grey[600])),
                   const SizedBox(height: 2),
-                  Text(
-                    '@${staff.username}',
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                  ),
+                  Text('@${staff.username}', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
                 ],
               ),
             ),
             const SizedBox(height: 12),
             Text(
               'Tindakan ini tidak dapat dibatalkan.',
-              style: TextStyle(
-                color: Colors.red[600],
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
+              style: TextStyle(color: Colors.red[600], fontSize: 12, fontStyle: FontStyle.italic),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Batal')),
           const SizedBox(width: 8),
           Obx(() {
             final controller = Get.find<PetugasController>();
             return ElevatedButton(
-              onPressed: controller.isLoading.value
-                  ? null
-                  : () => _handleDelete(context, staff),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
+              onPressed: controller.isLoading.value ? null : () => _handleDelete(context, staff),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
               child: controller.isLoading.value
                   ? const SizedBox(
                       width: 16,
@@ -343,26 +270,9 @@ class PetugasListWidget extends StatelessWidget {
 
   void _handleDelete(BuildContext context, User user) async {
     final controller = Get.find<PetugasController>();
-    final success = await controller.deleteUser(user);
+    await controller.deleteUser(user);
 
     Navigator.of(context).pop(); // Close dialog
-
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Petugas ${user.name} berhasil dihapus'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gagal menghapus petugas. Silakan coba lagi.'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    // Snackbar sudah ditampilkan oleh controller
   }
 }

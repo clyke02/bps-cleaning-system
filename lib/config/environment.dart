@@ -2,13 +2,35 @@ import 'dart:io';
 
 class Environment {
   // ================================
-  // KONFIGURASI IP ADDRESS
+  // 🎯 PILIH MODE (UBAH SESUAI KEBUTUHAN)
   // ================================
 
-  // IP Address PC Anda di jaringan lokal
-  // Cara cek: Buka CMD/Terminal, ketik: ipconfig (Windows) atau ifconfig (Mac/Linux)
-  // Cari IPv4 Address, contoh: 192.168.1.100
-  static const String localNetworkIP = '192.168.1.100'; // ⚠️ GANTI DENGAN IP PC ANDA!
+  // Mode yang tersedia:
+  // - 'development' : Testing di local (emulator/device fisik)
+  // - 'production'  : Deploy ke server production (BPS)
+  static const String mode = 'development'; // ⚠️ UBAH KE 'production' SAAT DEPLOY!
+
+  // ================================
+  // 🌐 PRODUCTION SERVER (UNTUK DEPLOYMENT)
+  // ================================
+
+  // URL server production BPS (ganti dengan domain/IP server sebenarnya)
+  // Contoh:
+  // - 'http://192.168.1.100:8000/api'  (IP server lokal BPS)
+  // - 'http://bps.go.id/cleaning-api'  (Domain production)
+  // - 'https://api.bps-cleaning.com'   (Domain dengan SSL)
+  static const String productionUrl = 'http://SERVER_IP_ANDA:8000/api'; // ⚠️ GANTI SEBELUM DEPLOY!
+
+  // ================================
+  // 🔧 DEVELOPMENT CONFIG (UNTUK TESTING)
+  // ================================
+
+  // IP Address PC Developer (hanya untuk development)
+  // Cara cek: ipconfig (Windows) atau ifconfig (Mac/Linux)
+  static const String localNetworkIP = '192.168.110.128'; // IP PC untuk development
+
+  // Set TRUE = emulator, FALSE = device fisik
+  static const bool useEmulator = false;
 
   // Debug mode detection
   static bool get isDebug {
@@ -18,28 +40,24 @@ class Environment {
   }
 
   // ================================
-  // AUTO DETECTION
+  // 🚀 AUTO SELECTION
   // ================================
 
   static String get baseUrl {
+    // Jika mode production, gunakan URL production
+    if (mode == 'production') {
+      return productionUrl;
+    }
+
+    // Jika development
     if (Platform.isAndroid) {
-      // Android: Gunakan emulator atau device fisik?
       return useEmulator ? emulatorUrl : deviceUrl;
     } else if (Platform.isIOS) {
-      // iOS Simulator
       return 'http://127.0.0.1:8000/api';
     } else {
-      // Web atau platform lain
       return 'http://127.0.0.1:8000/api';
     }
   }
-
-  // ================================
-  // SWITCH MODE
-  // ================================
-
-  // Set ke TRUE jika pakai emulator, FALSE jika pakai device fisik
-  static const bool useEmulator = true; // ⚠️ UBAH INI SESUAI KEBUTUHAN!
 
   // ================================
   // URL CONFIGURATIONS
@@ -48,7 +66,7 @@ class Environment {
   // URL untuk Android Emulator
   static const String emulatorUrl = 'http://10.0.2.2:8000/api';
 
-  // URL untuk Device Fisik (menggunakan IP lokal)
+  // URL untuk Device Fisik (development)
   static String get deviceUrl => 'http://$localNetworkIP:8000/api';
 
   // ================================
@@ -56,22 +74,28 @@ class Environment {
   // ================================
 
   static String get currentMode {
+    if (mode == 'production') {
+      return '🚀 PRODUCTION';
+    }
+
     if (Platform.isAndroid) {
-      return useEmulator ? 'Android Emulator' : 'Android Device Fisik';
+      return useEmulator ? '🔧 DEV - Android Emulator' : '🔧 DEV - Android Device Fisik';
     } else if (Platform.isIOS) {
-      return 'iOS Simulator';
+      return '🔧 DEV - iOS Simulator';
     } else {
-      return 'Web/Desktop';
+      return '🔧 DEV - Web/Desktop';
     }
   }
 
   static void printConfig() {
     print('═══════════════════════════════════════');
-    print('📱 Environment Configuration');
+    print('📱 BPS Cleaning System - API Config');
     print('═══════════════════════════════════════');
-    print('Mode: $currentMode');
+    print('Environment: $currentMode');
     print('Base URL: $baseUrl');
-    print('Local IP: $localNetworkIP');
+    if (mode == 'development') {
+      print('Dev IP: $localNetworkIP');
+    }
     print('═══════════════════════════════════════');
   }
 }

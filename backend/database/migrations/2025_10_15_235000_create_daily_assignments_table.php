@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('area_id');
             $table->date('assignment_date');
-            $table->enum('status', ['pending', 'completed', 'missed'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'missed', 'rejected'])->default('pending');
             $table->unsignedBigInteger('report_id')->nullable(); // Link ke report jika sudah dikerjakan
             $table->text('notes')->nullable();
             $table->timestamps();

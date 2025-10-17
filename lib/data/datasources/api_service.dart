@@ -300,10 +300,15 @@ class ApiService {
           throw Exception('Terjadi kesalahan server (${response.statusCode})');
         }
       }
+    } on TimeoutException catch (e) {
+      _logError(method, url, e);
+      throw Exception(
+        'Koneksi timeout. Pastikan:\n• HP dan PC terhubung ke WiFi yang sama\n• Server Laravel berjalan di ${Environment.baseUrl.replaceAll('/api', '')}\n• Firewall tidak memblokir koneksi',
+      );
     } on http.ClientException catch (e) {
       _logError(method, url, e);
       throw Exception(
-        'Tidak dapat terhubung ke server. Pastikan server Laravel berjalan di ${Environment.baseUrl.replaceAll('/api', '')}',
+        'Tidak dapat terhubung ke server. Pastikan:\n• HP dan PC terhubung ke WiFi yang sama\n• Server Laravel berjalan di ${Environment.baseUrl.replaceAll('/api', '')}',
       );
     } on FormatException catch (e) {
       _logError(method, url, e);

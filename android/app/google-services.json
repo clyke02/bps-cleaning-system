@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1008317000889",
+    "project_id": "bps-cleaning-system",
+    "storage_bucket": "bps-cleaning-system.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008317000889:android:fec54fb066afbfa8377f68",
+        "android_client_info": {
+          "package_name": "com.example.bps_cleaning_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPjP3xbt6CB6W0evr743meB0qmUq1fFwA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

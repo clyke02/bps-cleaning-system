@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../../../../config/environment.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class ReportController extends GetxController {
   var isLoading = false.obs;
@@ -31,10 +32,7 @@ class ReportController extends GetxController {
       print('Loading areas from: $baseUrl/areas');
 
       final response = await http
-          .get(
-            Uri.parse('$baseUrl/areas'),
-            headers: {'Accept': 'application/json'},
-          )
+          .get(Uri.parse('$baseUrl/areas'), headers: {'Accept': 'application/json'})
           .timeout(const Duration(seconds: 10));
 
       print('Areas response: ${response.statusCode}');
@@ -44,8 +42,7 @@ class ReportController extends GetxController {
         final data = json.decode(response.body);
         if (data['success'] == true && data['data'] != null) {
           // Remove duplicates based on area id
-          final List<Map<String, dynamic>> areas = (data['data'] as List)
-              .cast<Map<String, dynamic>>();
+          final List<Map<String, dynamic>> areas = (data['data'] as List).cast<Map<String, dynamic>>();
 
           // Use a Set to track unique IDs and filter duplicates
           final seenIds = <int>{};
@@ -80,7 +77,7 @@ class ReportController extends GetxController {
 
   Future<void> pickImage() async {
     if (photoBukti.length >= 3) {
-      Get.snackbar('Peringatan', 'Maksimal 3 foto untuk laporan darurat');
+      CustomSnackbar.showWarning(title: 'Peringatan', message: 'Maksimal 3 foto untuk laporan darurat');
       return;
     }
 
@@ -100,22 +97,22 @@ class ReportController extends GetxController {
         final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
         if (fileSizeInMB > 5) {
-          Get.snackbar('Peringatan', 'Ukuran file tidak boleh lebih dari 5MB');
+          CustomSnackbar.showWarning(title: 'Peringatan', message: 'Ukuran file tidak boleh lebih dari 5MB');
           return;
         }
 
         photoBukti.add(imageFile);
-        Get.snackbar('Sukses', 'Foto berhasil ditambahkan');
+        CustomSnackbar.showSuccess(title: 'Sukses', message: 'Foto berhasil ditambahkan');
       }
     } catch (e) {
       print('Error picking image: $e');
-      Get.snackbar('Error', 'Gagal mengambil foto: ${e.toString()}');
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal mengambil foto: ${e.toString()}');
     }
   }
 
   Future<void> pickImageFromGallery() async {
     if (photoBukti.length >= 3) {
-      Get.snackbar('Peringatan', 'Maksimal 3 foto untuk laporan darurat');
+      CustomSnackbar.showWarning(title: 'Peringatan', message: 'Maksimal 3 foto untuk laporan darurat');
       return;
     }
 
@@ -135,16 +132,16 @@ class ReportController extends GetxController {
         final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
         if (fileSizeInMB > 5) {
-          Get.snackbar('Peringatan', 'Ukuran file tidak boleh lebih dari 5MB');
+          CustomSnackbar.showWarning(title: 'Peringatan', message: 'Ukuran file tidak boleh lebih dari 5MB');
           return;
         }
 
         photoBukti.add(imageFile);
-        Get.snackbar('Sukses', 'Foto berhasil ditambahkan');
+        CustomSnackbar.showSuccess(title: 'Sukses', message: 'Foto berhasil ditambahkan');
       }
     } catch (e) {
-      print('Error picking image: $e');
-      Get.snackbar('Error', 'Gagal mengambil foto: ${e.toString()}');
+      print('Error picking image from gallery: $e');
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal mengambil foto: ${e.toString()}');
     }
   }
 
@@ -156,50 +153,39 @@ class ReportController extends GetxController {
 
   Future<void> submitEmergencyReport() async {
     if (selectedArea.value == null) {
-      Get.snackbar('Peringatan', 'Pilih area yang akan dilaporkan');
+      CustomSnackbar.showWarning(title: 'Peringatan', message: 'Pilih area yang akan dilaporkan');
       return;
     }
 
     if (descriptionController.text.trim().isEmpty) {
-      Get.snackbar('Peringatan', 'Catatan petugas harus diisi');
+      CustomSnackbar.showWarning(title: 'Peringatan', message: 'Catatan petugas harus diisi');
       return;
     }
 
     if (photoBukti.isEmpty) {
-      Get.snackbar('Peringatan', 'Upload minimal satu foto bukti');
+      CustomSnackbar.showWarning(title: 'Peringatan', message: 'Upload minimal satu foto bukti');
       return;
     }
 
     try {
       isLoading.value = true;
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(
-        'auth_token',
-      ); // FIX: gunakan key yang benar
+      final token = prefs.getString('auth_token'); // FIX: gunakan key yang benar
       final userId = prefs.getInt('user_id');
       final userName = prefs.getString('user_name');
 
       if (token == null || userId == null) {
-        Get.snackbar(
-          'Error',
-          'Data user tidak ditemukan. Silakan login kembali.',
-        );
+        CustomSnackbar.showError(title: 'Error', message: 'Data user tidak ditemukan. Silakan login kembali.');
         return;
       }
 
       final area = selectedArea.value!;
 
       // Create multipart request
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('${Environment.baseUrl}/emergency-reports'),
-      );
+      final request = http.MultipartRequest('POST', Uri.parse('${Environment.baseUrl}/emergency-reports'));
 
       // Add headers
-      request.headers.addAll({
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      });
+      request.headers.addAll({'Authorization': 'Bearer $token', 'Accept': 'application/json'});
 
       // Add form fields
       request.fields.addAll({
@@ -215,10 +201,7 @@ class ReportController extends GetxController {
       // Add photo files
       for (int i = 0; i < photoBukti.length; i++) {
         final file = photoBukti[i];
-        final multipartFile = await http.MultipartFile.fromPath(
-          'photos[]',
-          file.path,
-        );
+        final multipartFile = await http.MultipartFile.fromPath('photos[]', file.path);
         request.files.add(multipartFile);
       }
 
@@ -232,26 +215,18 @@ class ReportController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(responseBody);
         if (data['success'] == true) {
-          Get.snackbar(
-            'Sukses',
-            'Laporan darurat berhasil dikirim',
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
+          CustomSnackbar.showSuccess(title: 'Sukses', message: 'Laporan darurat berhasil dikirim');
           clearForm();
         } else {
-          Get.snackbar('Error', data['message'] ?? 'Gagal mengirim laporan');
+          CustomSnackbar.showError(title: 'Error', message: data['message'] ?? 'Gagal mengirim laporan');
         }
       } else {
         final errorData = json.decode(responseBody);
-        Get.snackbar(
-          'Error',
-          errorData['message'] ?? 'Gagal mengirim laporan darurat',
-        );
+        CustomSnackbar.showError(title: 'Error', message: errorData['message'] ?? 'Gagal mengirim laporan darurat');
       }
     } catch (e) {
       print('Error submitting emergency report: $e');
-      Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
+      CustomSnackbar.showError(title: 'Error', message: 'Terjadi kesalahan: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

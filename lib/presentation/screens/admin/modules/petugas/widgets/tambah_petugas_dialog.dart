@@ -47,11 +47,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
           color: Colors.white, // Warna background dialog
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5)),
           ],
         ),
         child: SingleChildScrollView(
@@ -70,28 +66,16 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                         color: const Color(0xFF2196F3).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
-                        Icons.person_add,
-                        color: Color(0xFF2196F3),
-                      ),
+                      child: const Icon(Icons.person_add, color: Color(0xFF2196F3)),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
-                      child: Text(
-                        'Tambah Petugas Baru',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Text('Tambah Petugas Baru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close),
-                      style: IconButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(32, 32),
-                      ),
+                      style: IconButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(32, 32)),
                     ),
                   ],
                 ),
@@ -156,10 +140,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                 const SizedBox(height: 16),
 
                 // Role Dropdown
-                const Text(
-                  'Role',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
+                const Text('Role', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
@@ -174,10 +155,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                       });
                     },
                     decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       border: InputBorder.none,
                     ),
                     items: const [
@@ -185,11 +163,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                         value: 'user',
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.cleaning_services,
-                              size: 16,
-                              color: Colors.green,
-                            ),
+                            Icon(Icons.cleaning_services, size: 16, color: Colors.green),
                             SizedBox(width: 8),
                             Text('Petugas Cleaning'),
                           ],
@@ -199,11 +173,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                         value: 'admin',
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.admin_panel_settings,
-                              size: 16,
-                              color: Colors.blue,
-                            ),
+                            Icon(Icons.admin_panel_settings, size: 16, color: Colors.blue),
                             SizedBox(width: 8),
                             Text('Admin'),
                           ],
@@ -270,9 +240,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                         onPressed: () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: const Text('Batal'),
                       ),
@@ -281,16 +249,12 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                     Expanded(
                       child: Obx(
                         () => ElevatedButton(
-                          onPressed: _controller.isLoading.value
-                              ? null
-                              : _handleSubmit,
+                          onPressed: _controller.isLoading.value ? null : _handleSubmit,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2196F3),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: _controller.isLoading.value
                               ? const SizedBox(
@@ -298,15 +262,10 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                   ),
                                 )
-                              : const Text(
-                                  'Tambah',
-                                  style: TextStyle(fontWeight: FontWeight.w600),
-                                ),
+                              : const Text('Tambah', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ),
@@ -333,10 +292,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
+        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -349,10 +305,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
             suffixIcon: onToggleVisibility != null
                 ? IconButton(
                     onPressed: onToggleVisibility,
-                    icon: Icon(
-                      isObscured ? Icons.visibility : Icons.visibility_off,
-                      size: 20,
-                    ),
+                    icon: Icon(isObscured ? Icons.visibility : Icons.visibility_off, size: 20),
                   )
                 : null,
             border: OutlineInputBorder(
@@ -375,10 +328,7 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
       ],
@@ -402,25 +352,9 @@ class _TambahPetugasDialogState extends State<TambahPetugasDialog> {
         if (widget.onUserAdded != null) {
           widget.onUserAdded!();
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Petugas berhasil ditambahkan'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Gagal menambahkan petugas. Silakan coba lagi.',
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        // Snackbar sudah ditampilkan oleh controller
       }
+      // Error snackbar sudah ditampilkan oleh controller
     }
   }
 }

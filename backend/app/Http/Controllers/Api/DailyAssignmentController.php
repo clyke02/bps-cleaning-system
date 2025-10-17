@@ -150,7 +150,21 @@ class DailyAssignmentController extends Controller
                     ->first();
 
                 if ($existing) {
-                    $skipped++;
+                    // Reset assignment for today regardless of its current status.
+                    // When admin presses Generate, users must be able to report again
+                    // for the new day so we clear report_id and set status to 'pending'.
+                    try {
+                        $existing->update([
+                            'report_id' => null,
+                            'status' => 'pending'
+                        ]);
+                        // Count as created since the assignment is effectively refreshed
+                        $created++;
+                    } catch (\Exception $e) {
+                        // If update fails, skip and continue
+                        $skipped++;
+                    }
+
                     continue;
                 }
 
@@ -163,6 +177,16 @@ class DailyAssignmentController extends Controller
                 ]);
 
                 $created++;
+            }
+
+            // Send notification to all users after creating assignments
+            if ($created > 0) {
+                \App\Services\FCMService::sendToRole(
+                    'user',
+                    'Tugas Harian Baru',
+                    "Ada $created tugas pembersihan baru untuk hari ini",
+                    ['type' => 'new_assignment', 'count' => $created]
+                );
             }
 
             return response()->json([

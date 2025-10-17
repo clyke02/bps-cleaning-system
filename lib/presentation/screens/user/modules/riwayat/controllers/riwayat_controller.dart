@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../../config/environment.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class RiwayatController extends GetxController {
   var isLoading = false.obs;
@@ -30,10 +31,7 @@ class RiwayatController extends GetxController {
       print('🔄 Loading riwayat for user $userId...');
       final response = await http.get(
         Uri.parse('${Environment.baseUrl}/user-reports/$userId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+        headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
       );
 
       print('📊 Riwayat Response: ${response.statusCode}');
@@ -42,8 +40,7 @@ class RiwayatController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true && data['data'] != null) {
-          historyList.value = (data['data'] as List)
-              .cast<Map<String, dynamic>>();
+          historyList.value = (data['data'] as List).cast<Map<String, dynamic>>();
           print('✅ Loaded ${historyList.length} riwayat items');
         }
       } else {
@@ -51,7 +48,7 @@ class RiwayatController extends GetxController {
       }
     } catch (e) {
       print('❌ Error loading riwayat: $e');
-      Get.snackbar('Error', 'Gagal memuat riwayat: ${e.toString()}');
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal memuat riwayat: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

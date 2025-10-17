@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../config/environment.dart';
+import '../../shared/widgets/custom_snackbar.dart';
 
 class AuthHelper {
   /// Validate apakah user masih exist di database
@@ -69,9 +70,7 @@ class AuthHelper {
 
         // Show message if reason provided
         if (reason != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(reason), backgroundColor: Colors.orange, duration: const Duration(seconds: 4)),
-          );
+          CustomSnackbar.showWarning(title: 'Perhatian', message: reason);
         }
       }
     } catch (e) {

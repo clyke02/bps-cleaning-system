@@ -14,6 +14,7 @@ Route::post('/login', [AuthController::class, 'login']);
 // Temporary: Allow users API without auth for development
 Route::apiResource('users', UserController::class);
 Route::put('/users/{id}/change-password', [UserController::class, 'changePassword']);
+Route::put('/users/{id}/fcm-token', [UserController::class, 'updateFCMToken']);
 
 // Daily Assignments API routes
 Route::get('/users/{userId}/assignments', [DailyAssignmentController::class, 'getUserAssignments']);

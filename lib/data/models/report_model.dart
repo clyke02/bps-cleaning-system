@@ -25,10 +25,11 @@ class Report {
     this.tasks = const [],
   });
 
-  // Formatted date getter
+  // Formatted date getter with local timezone (WIB)
   String get formattedDate {
     try {
-      final dateTime = DateTime.parse(tanggal);
+      // Parse as UTC then convert to local timezone
+      final dateTime = DateTime.parse(tanggal).toLocal();
       return '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } catch (e) {
       return tanggal; // Return original if parsing fails
@@ -78,11 +79,7 @@ class Report {
       rating: json['rating'],
       imagePaths: List<String>.from(json['image_paths'] ?? []),
       areaId: json['area_id'] ?? 0,
-      tasks:
-          (json['tasks'] as List<dynamic>?)
-              ?.map((task) => CleaningTask.fromJson(task))
-              .toList() ??
-          [],
+      tasks: (json['tasks'] as List<dynamic>?)?.map((task) => CleaningTask.fromJson(task)).toList() ?? [],
     );
   }
 
@@ -134,11 +131,7 @@ class CleaningTask {
   final String description;
   final bool isCompleted;
 
-  CleaningTask({
-    required this.id,
-    required this.description,
-    this.isCompleted = false,
-  });
+  CleaningTask({required this.id, required this.description, this.isCompleted = false});
 
   CleaningTask copyWith({int? id, String? description, bool? isCompleted}) {
     return CleaningTask(

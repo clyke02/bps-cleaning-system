@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/laporan_controller.dart';
 import '../../../../../../data/models/report_model.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class LaporanCard extends StatelessWidget {
   final Report report;
@@ -34,28 +35,14 @@ class LaporanCard extends StatelessWidget {
                       children: [
                         Text(
                           report.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(
-                              Icons.person,
-                              size: 16,
-                              color: Colors.grey[600],
-                            ),
+                            Icon(Icons.person, size: 16, color: Colors.grey[600]),
                             const SizedBox(width: 4),
-                            Text(
-                              report.petugas,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
+                            Text(report.petugas, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                           ],
                         ),
                       ],
@@ -73,17 +60,11 @@ class LaporanCard extends StatelessWidget {
                 children: [
                   Icon(Icons.calendar_today, size: 16, color: Colors.grey[500]),
                   const SizedBox(width: 4),
-                  Text(
-                    report.tanggal,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
+                  Text(report.formattedDate, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                   const Spacer(),
                   Icon(Icons.location_on, size: 16, color: Colors.grey[500]),
                   const SizedBox(width: 4),
-                  Text(
-                    'Area ${report.areaId}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
+                  Text('Area ${report.areaId}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 ],
               ),
 
@@ -99,10 +80,7 @@ class LaporanCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         side: BorderSide(color: Colors.blue[600]!),
                       ),
-                      child: Text(
-                        'Detail',
-                        style: TextStyle(color: Colors.blue[600]),
-                      ),
+                      child: Text('Detail', style: TextStyle(color: Colors.blue[600])),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -165,11 +143,7 @@ class LaporanCard extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -186,21 +160,14 @@ class LaporanCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow('Petugas', report.petugas),
-            _buildDetailRow('Tanggal', report.tanggal),
+            _buildDetailRow('Tanggal', report.formattedDate),
             _buildDetailRow('Area', 'Area ${report.areaId}'),
             _buildDetailRow('Status', _getStatusText()),
-            if (report.catatanPetugas?.isNotEmpty == true)
-              _buildDetailRow('Catatan Petugas', report.catatanPetugas!),
-            if (report.catatanAdmin?.isNotEmpty == true)
-              _buildDetailRow('Catatan Admin', report.catatanAdmin!),
+            if (report.catatanPetugas?.isNotEmpty == true) _buildDetailRow('Catatan Petugas', report.catatanPetugas!),
+            if (report.catatanAdmin?.isNotEmpty == true) _buildDetailRow('Catatan Admin', report.catatanAdmin!),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Tutup'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Tutup'))],
       ),
     );
   }
@@ -227,25 +194,14 @@ class LaporanCard extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.rate_review,
-                        color: Colors.blue[700],
-                        size: 24,
-                      ),
+                      decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
+                      child: Icon(Icons.rate_review, color: Colors.blue[700], size: 24),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
                       child: Text(
                         'Review Laporan',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
                     ),
                   ],
@@ -255,11 +211,7 @@ class LaporanCard extends StatelessWidget {
                 // Status Selection
                 const Text(
                   'Pilih Status',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
                 const SizedBox(height: 12),
                 Obx(
@@ -300,11 +252,7 @@ class LaporanCard extends StatelessWidget {
                 // Rating
                 const Text(
                   'Beri Rating (Opsional)',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
                 const SizedBox(height: 12),
                 Obx(
@@ -313,9 +261,7 @@ class LaporanCard extends StatelessWidget {
                     children: List.generate(5, (index) {
                       return IconButton(
                         icon: Icon(
-                          index < selectedRating.value
-                              ? Icons.star
-                              : Icons.star_border,
+                          index < selectedRating.value ? Icons.star : Icons.star_border,
                           color: Colors.amber,
                           size: 32,
                         ),
@@ -330,11 +276,7 @@ class LaporanCard extends StatelessWidget {
                 // Notes
                 const Text(
                   'Catatan Admin (Opsional)',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -342,9 +284,7 @@ class LaporanCard extends StatelessWidget {
                   maxLines: 4,
                   decoration: InputDecoration(
                     hintText: 'Tulis catatan untuk petugas...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     filled: true,
                     fillColor: Colors.grey[50],
                   ),
@@ -358,9 +298,7 @@ class LaporanCard extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
+                        style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
                         child: const Text('Batal'),
                       ),
                     ),
@@ -372,30 +310,20 @@ class LaporanCard extends StatelessWidget {
                               ? null
                               : () async {
                                   Navigator.pop(context);
-                                  final success = await controller
-                                      .updateReportStatusWithNotes(
-                                        report.id.toString(),
-                                        selectedStatus.value!,
-                                        noteController.text.trim(),
-                                        selectedRating.value,
-                                      );
+                                  final success = await controller.updateReportStatusWithNotes(
+                                    report.id.toString(),
+                                    selectedStatus.value!,
+                                    noteController.text.trim(),
+                                    selectedRating.value,
+                                  );
 
                                   if (success) {
-                                    Get.snackbar(
-                                      'Berhasil',
-                                      'Status laporan berhasil diupdate',
-                                      backgroundColor: Colors.green,
-                                      colorText: Colors.white,
-                                      snackPosition: SnackPosition.BOTTOM,
+                                    CustomSnackbar.showSuccess(
+                                      title: 'Berhasil',
+                                      message: 'Status laporan berhasil diupdate',
                                     );
                                   } else {
-                                    Get.snackbar(
-                                      'Gagal',
-                                      'Gagal update status laporan',
-                                      backgroundColor: Colors.red,
-                                      colorText: Colors.white,
-                                      snackPosition: SnackPosition.BOTTOM,
-                                    );
+                                    CustomSnackbar.showError(title: 'Gagal', message: 'Gagal update status laporan');
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
@@ -427,10 +355,7 @@ class LaporanCard extends StatelessWidget {
             width: 100,
             child: Text(
               '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87),
             ),
           ),
           Expanded(

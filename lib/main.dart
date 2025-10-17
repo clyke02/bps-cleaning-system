@@ -8,8 +8,19 @@ import 'package:get/get.dart';
 // Screens (using barrel export)
 import 'presentation/exports/screens_exports.dart';
 
-void main() {
+// Services
+import 'services/fcm_service.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize FCM
+  try {
+    await FCMService.initialize();
+  } catch (e) {
+    debugPrint('FCM initialization failed: $e');
+    // Continue app execution even if FCM fails
+  }
 
   // Performance optimizations
   _optimizeImageCache();

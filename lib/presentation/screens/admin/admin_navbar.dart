@@ -4,26 +4,16 @@ class AdminNavbar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTabSelected;
 
-  const AdminNavbar({
-    super.key,
-    required this.currentIndex,
-    required this.onTabSelected,
-  });
+  const AdminNavbar({super.key, required this.currentIndex, required this.onTabSelected});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 65,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
       ),
       child: Row(
         children: [
@@ -43,11 +33,7 @@ class AdminNavbar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: isSelected ? const Color(0xFF4CAF50) : Colors.grey,
-            size: 24,
-          ),
+          Icon(icon, color: isSelected ? const Color(0xFF4CAF50) : Colors.grey, size: 24),
           const SizedBox(height: 4),
           Text(
             label,

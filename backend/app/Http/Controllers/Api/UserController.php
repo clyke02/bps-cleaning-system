@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -191,6 +192,57 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to change password',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update user FCM token
+     */
+    public function updateFCMToken(Request $request, string $id): JsonResponse
+    {
+        try {
+            Log::info('FCM Token update request', [
+                'user_id' => $id,
+                'token' => $request->fcm_token ?? 'NULL',
+                'request_all' => $request->all()
+            ]);
+
+            $validator = Validator::make($request->all(), [
+                'fcm_token' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('FCM Token validation failed', ['errors' => $validator->errors()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = User::findOrFail($id);
+            $user->update(['fcm_token' => $request->fcm_token]);
+
+            Log::info('FCM Token updated successfully', [
+                'user_id' => $id,
+                'user_name' => $user->name,
+                'token_length' => strlen($request->fcm_token)
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FCM token updated successfully',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update FCM token', [
+                'user_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update FCM token',
                 'error' => $e->getMessage()
             ], 500);
         }

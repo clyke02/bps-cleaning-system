@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReportController extends Controller
 {
@@ -93,8 +94,8 @@ class ReportController extends Controller
                 }
             }
 
-            // Update daily assignment status to 'completed' (SHARED MODE - by area only, not user)
-            // Whoever submits report first completes the assignment for ALL users
+            // Update daily assignment - set report_id but keep status as 'pending' (IN REVIEW)
+            // Status will change to 'completed' or 'rejected' when admin reviews the report
             $today = now()->toDateString();
             $assignment = \App\Models\DailyAssignment::where('area_id', $request->area_id)
                 ->where('assignment_date', $today)
@@ -103,15 +104,15 @@ class ReportController extends Controller
 
             if ($assignment) {
                 $assignment->update([
-                    'status' => 'completed',
+                    'status' => 'pending', // Keep as pending until admin reviews
                     'report_id' => $report->id,
                 ]);
 
                 if (config('app.debug')) {
-                    \Log::info('Assignment updated to completed (shared mode)', [
+                    Log::info('Assignment report submitted (in review)', [
                         'assignment_id' => $assignment->id,
                         'area_id' => $request->area_id,
-                        'completed_by_user_id' => $request->user_id,
+                        'submitted_by_user_id' => $request->user_id,
                         'report_id' => $report->id,
                     ]);
                 }
@@ -121,6 +122,17 @@ class ReportController extends Controller
 
             // Load relationships
             $report->load(['photos', 'tasks', 'area', 'user']);
+
+            // Send notification to all admins
+            $user = \App\Models\User::find($request->user_id);
+            if ($user) {
+                \App\Services\FCMService::sendToRole(
+                    'admin',
+                    'Laporan Baru Masuk',
+                    "{$user->name} mengirim laporan pembersihan {$request->area_name}",
+                    ['type' => 'new_report', 'report_id' => $report->id]
+                );
+            }
 
             return response()->json([
                 'success' => true,
@@ -280,8 +292,42 @@ class ReportController extends Controller
                 'reviewed_at' => now(),
             ]);
 
+            // Update daily assignment based on approval/rejection
+            $assignment = \App\Models\DailyAssignment::where('report_id', $report->id)->first();
+            if ($assignment) {
+                if ($request->status === 'approved') {
+                    // Approved: mark assignment as completed
+                    $assignment->update(['status' => 'completed']);
+                } elseif ($request->status === 'rejected') {
+                    // Rejected: mark as rejected and clear report_id so user can re-submit
+                    $assignment->update([
+                        'status' => 'rejected',
+                        'report_id' => null,
+                    ]);
+                }
+                
+                if (config('app.debug')) {
+                    Log::info('Assignment status updated after review', [
+                        'assignment_id' => $assignment->id,
+                        'report_id' => $report->id,
+                        'new_status' => $assignment->status,
+                    ]);
+                }
+            }
+
             // Load relationships for complete response
             $report->load(['photos', 'tasks', 'area', 'user', 'reviewer']);
+
+            // Send notification to report owner
+            $statusText = $request->status === 'approved' ? 'disetujui' : 'ditolak';
+            if ($report->user && $report->user->fcm_token) {
+                \App\Services\FCMService::sendToUser(
+                    $report->user->fcm_token,
+                    'Laporan ' . ucfirst($statusText),
+                    "Laporan pembersihan {$report->area->name} telah $statusText oleh admin",
+                    ['type' => 'report_reviewed', 'report_id' => $report->id, 'status' => $request->status]
+                );
+            }
 
             return response()->json([
                 'success' => true,

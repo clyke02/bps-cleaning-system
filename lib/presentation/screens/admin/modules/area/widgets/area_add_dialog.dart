@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../controllers/area_controller.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class TambahAreaDialog extends StatefulWidget {
   final AreaController controller;
@@ -20,7 +21,7 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
   String? _selectedLantai;
   final List<String> _lantaiOptions = ['1', '2'];
 
-  List<String> _kebersihanList = [];
+  final List<String> _kebersihanList = [];
 
   @override
   void initState() {
@@ -527,16 +528,12 @@ class _TambahAreaDialogState extends State<TambahAreaDialog> {
         Navigator.of(context).pop();
 
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Area berhasil ${widget.area == null ? 'ditambahkan' : 'diupdate'}!'),
-              backgroundColor: const Color(0xFF4CAF50),
-            ),
+          CustomSnackbar.showSuccess(
+            title: 'Berhasil',
+            message: 'Area berhasil ${widget.area == null ? 'ditambahkan' : 'diupdate'}!',
           );
         } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Gagal memproses area'), backgroundColor: Colors.red));
+          CustomSnackbar.showError(title: 'Error', message: 'Gagal memproses area');
         }
       }
     }

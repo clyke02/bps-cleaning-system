@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../data/models/petugas_model.dart';
 import '../../../../config/environment.dart';
+import '../../../../shared/widgets/custom_snackbar.dart';
 
 class UserController extends GetxController {
   // Observable variables untuk user yang login
@@ -74,7 +75,7 @@ class UserController extends GetxController {
         print('DEBUG: Error loading petugas: $e');
       }
       errorMessage.value = 'Gagal memuat data petugas: ${e.toString()}';
-      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.showError(title: 'Error', message: errorMessage.value);
     } finally {
       isLoading.value = false;
     }
@@ -100,18 +101,12 @@ class UserController extends GetxController {
       //   'role': role,
       // });
 
-      Get.snackbar(
-        'Sukses',
-        'Petugas berhasil ditambahkan!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
-      );
+      CustomSnackbar.showSuccess(title: 'Sukses', message: 'Petugas berhasil ditambahkan!');
 
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menambahkan petugas: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal menambahkan petugas: ${e.toString()}');
       return false;
     } finally {
       isLoading.value = false;
@@ -139,18 +134,12 @@ class UserController extends GetxController {
       //   'role': role,
       // });
 
-      Get.snackbar(
-        'Sukses',
-        'Data petugas berhasil diperbarui!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
-      );
+      CustomSnackbar.showSuccess(title: 'Sukses', message: 'Data petugas berhasil diperbarui!');
 
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memperbarui petugas: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal memperbarui petugas: ${e.toString()}');
       return false;
     } finally {
       isLoading.value = false;
@@ -165,18 +154,12 @@ class UserController extends GetxController {
       // TODO: Implement API call to delete petugas
       // await _apiService.delete('/petugas/$id');
 
-      Get.snackbar(
-        'Sukses',
-        'Petugas berhasil dihapus!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
-      );
+      CustomSnackbar.showSuccess(title: 'Sukses', message: 'Petugas berhasil dihapus!');
 
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menghapus petugas: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal menghapus petugas: ${e.toString()}');
       return false;
     } finally {
       isLoading.value = false;
@@ -189,18 +172,12 @@ class UserController extends GetxController {
       // TODO: Implement API call to update status
       // await _apiService.patch('/petugas/$id/status', {'status': status});
 
-      Get.snackbar(
-        'Sukses',
-        'Status petugas berhasil diperbarui!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
-      );
+      CustomSnackbar.showSuccess(title: 'Sukses', message: 'Status petugas berhasil diperbarui!');
 
       await loadPetugas();
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memperbarui status: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal memperbarui status: ${e.toString()}');
       return false;
     }
   }

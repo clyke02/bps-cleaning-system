@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/area_controller.dart';
 import 'area_add_dialog.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class AreaCard extends StatelessWidget {
   final Area area;
@@ -34,25 +35,14 @@ class AreaCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               area.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                             ),
                           ),
                           _buildStatusChip(),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        area.description,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                          height: 1.4,
-                        ),
-                      ),
+                      Text(area.description, style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4)),
                     ],
                   ),
                 ),
@@ -66,17 +56,11 @@ class AreaCard extends StatelessWidget {
               children: [
                 Icon(Icons.assignment, size: 16, color: Colors.grey[500]),
                 const SizedBox(width: 4),
-                Text(
-                  '${area.reportCount} Laporan',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                Text('${area.reportCount} Laporan', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 const Spacer(),
                 Icon(Icons.calendar_today, size: 16, color: Colors.grey[500]),
                 const SizedBox(width: 4),
-                Text(
-                  _formatDate(area.createdAt),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                Text(_formatDate(area.createdAt), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
 
@@ -90,24 +74,17 @@ class AreaCard extends StatelessWidget {
                     onPressed: () => _showEditDialog(context, controller),
                     icon: const Icon(Icons.edit, size: 16),
                     label: const Text('Edit'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 8)),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _showToggleDialog(context, controller),
-                    icon: Icon(
-                      area.isActive ? Icons.pause : Icons.play_arrow,
-                      size: 16,
-                    ),
+                    icon: Icon(area.isActive ? Icons.pause : Icons.play_arrow, size: 16),
                     label: Text(area.isActive ? 'Nonaktifkan' : 'Aktifkan'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: area.isActive
-                          ? Colors.orange[600]
-                          : Colors.green[600],
+                      backgroundColor: area.isActive ? Colors.orange[600] : Colors.green[600],
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
@@ -131,15 +108,9 @@ class AreaCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: area.isActive
-            ? Colors.green.withOpacity(0.1)
-            : Colors.grey.withOpacity(0.1),
+        color: area.isActive ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: area.isActive
-              ? Colors.green.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.3),
-        ),
+        border: Border.all(color: area.isActive ? Colors.green.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -164,28 +135,14 @@ class AreaCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   void _showEditDialog(BuildContext context, AreaController controller) {
     showDialog(
       context: context,
-      builder: (context) =>
-          TambahAreaDialog(controller: controller, area: area),
+      builder: (context) => TambahAreaDialog(controller: controller, area: area),
     );
   }
 
@@ -198,22 +155,16 @@ class AreaCard extends StatelessWidget {
           'Apakah Anda yakin ingin ${area.isActive ? 'menonaktifkan' : 'mengaktifkan'} area "${area.name}"?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
           ElevatedButton(
             onPressed: () async {
               final success = await controller.toggleAreaStatus(area.id);
               if (context.mounted) {
                 Navigator.pop(context);
                 if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Area berhasil ${area.isActive ? 'dinonaktifkan' : 'diaktifkan'}',
-                      ),
-                    ),
+                  CustomSnackbar.showSuccess(
+                    title: 'Berhasil',
+                    message: 'Area berhasil ${area.isActive ? 'dinonaktifkan' : 'diaktifkan'}',
                   );
                 }
               }
@@ -241,11 +192,7 @@ class AreaCard extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 15, offset: const Offset(0, 5)),
             ],
           ),
           child: Column(
@@ -254,25 +201,14 @@ class AreaCard extends StatelessWidget {
               // Icon
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                  size: 32,
-                ),
+                decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), shape: BoxShape.circle),
+                child: const Icon(Icons.delete_outline, color: Colors.red, size: 32),
               ),
               const SizedBox(height: 20),
               // Title
               const Text(
                 'Hapus Area',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               const SizedBox(height: 12),
               // Content
@@ -290,17 +226,12 @@ class AreaCard extends StatelessWidget {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         side: BorderSide(color: Colors.grey.shade300),
                       ),
                       child: const Text(
                         'Batal',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -312,11 +243,7 @@ class AreaCard extends StatelessWidget {
                         if (context.mounted) {
                           Navigator.pop(context);
                           if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Area berhasil dihapus'),
-                              ),
-                            );
+                            CustomSnackbar.showSuccess(title: 'Berhasil', message: 'Area berhasil dihapus');
                           }
                         }
                       },
@@ -324,14 +251,9 @@ class AreaCard extends StatelessWidget {
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        'Hapus',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      child: const Text('Hapus', style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ],

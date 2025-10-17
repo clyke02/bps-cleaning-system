@@ -117,13 +117,22 @@ class HomeView extends StatelessWidget {
               value: controller.pendingAssignmentsCount,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: _buildSummaryCard(
               title: 'Selesai',
               icon: Icons.check_circle,
               color: Colors.green,
               value: controller.completedAssignmentsCount,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildSummaryCard(
+              title: 'Ditolak',
+              icon: Icons.cancel,
+              color: Colors.red,
+              value: controller.rejectedAssignmentsCount,
             ),
           ),
         ],
@@ -133,7 +142,7 @@ class HomeView extends StatelessWidget {
 
   Widget _buildSummaryCard({required String title, required IconData icon, required Color color, required int value}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -142,14 +151,14 @@ class HomeView extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(height: 12),
           Text(
             value.toString(),
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
           ),
           const SizedBox(height: 4),
           Text(
@@ -288,16 +297,32 @@ class HomeView extends StatelessWidget {
     Color statusBgColor;
     String statusText;
 
+    // Check if user has submitted report (reportId exists) but not yet reviewed
+    final bool hasReport = assignment.reportId != null;
+
     switch (assignment.status) {
       case 'pending':
-        statusColor = Colors.orange[700]!;
-        statusBgColor = Colors.orange[100]!;
-        statusText = 'Belum Lapor';
+        if (hasReport) {
+          // User sudah submit laporan, menunggu review admin
+          statusColor = Colors.blue[700]!;
+          statusBgColor = Colors.blue[100]!;
+          statusText = 'In Review';
+        } else {
+          // User belum submit laporan
+          statusColor = Colors.orange[700]!;
+          statusBgColor = Colors.orange[100]!;
+          statusText = 'Belum Lapor';
+        }
         break;
       case 'completed':
         statusColor = Colors.green[700]!;
         statusBgColor = Colors.green[100]!;
         statusText = 'Disetujui';
+        break;
+      case 'rejected':
+        statusColor = Colors.red[700]!;
+        statusBgColor = Colors.red[100]!;
+        statusText = 'Ditolak';
         break;
       case 'missed':
         statusColor = Colors.red[700]!;
@@ -312,8 +337,13 @@ class HomeView extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Only open dialog if status is pending
-        if (assignment.status == 'pending' && assignment.area != null) {
+        // Allow opening dialog if:
+        // 1. Status is pending AND no report submitted yet (Belum Lapor), OR
+        // 2. Status is rejected (user can re-submit)
+        final canReport =
+            (assignment.status == 'pending' && assignment.reportId == null) || assignment.status == 'rejected';
+
+        if (canReport && assignment.area != null) {
           // Convert Map to Area object
           final areaData = assignment.area!;
           final area = Area(

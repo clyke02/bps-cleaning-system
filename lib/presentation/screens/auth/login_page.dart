@@ -3,6 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../data/models/user.dart';
 import '../../../core/constants/app_styles.dart';
+import '../../../services/fcm_service.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../../config/environment.dart';
+import 'dart:developer' as dev;
+import '../../../shared/widgets/custom_snackbar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _login() async {
     // Validasi form
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-      _showSnackBar('Username dan password harus diisi');
+      CustomSnackbar.showWarning(title: 'Peringatan', message: 'Username dan password harus diisi');
       return;
     }
 
@@ -46,13 +52,24 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('user_role', user.role);
       await prefs.setString('auth_token', token);
 
+      // Save FCM token to backend
+      try {
+        final fcmToken = await FCMService.getToken();
+        if (fcmToken != null) {
+          await _updateFCMToken(user.id, fcmToken);
+        }
+      } catch (e) {
+        dev.log('Error saving FCM token: $e');
+        // Continue even if FCM token save fails
+      }
+
       if (user.isAdmin) {
         Navigator.pushReplacementNamed(context, '/admin');
       } else {
         Navigator.pushReplacementNamed(context, '/user');
       }
 
-      _showSnackBar('Selamat datang, ${user.name}!');
+      CustomSnackbar.showSuccess(title: 'Selamat Datang!', message: 'Halo, ${user.name}!');
     } catch (e) {
       String errorMessage = e
           .toString()
@@ -74,15 +91,13 @@ class _LoginPageState extends State<LoginPage> {
           errorMessage.contains('Unauthorized') ||
           errorMessage.contains('401')) {
         errorMessage = 'Username atau Password salah, harap coba lagi';
-      } else if (errorMessage.contains('Connection refused') ||
-          errorMessage.contains('tidak dapat terhubung')) {
-        errorMessage =
-            'Tidak dapat terhubung ke server, periksa koneksi internet';
+      } else if (errorMessage.contains('Connection refused') || errorMessage.contains('tidak dapat terhubung')) {
+        errorMessage = 'Tidak dapat terhubung ke server, periksa koneksi internet';
       } else if (errorMessage.isEmpty) {
         errorMessage = 'Terjadi kesalahan, silakan coba lagi';
       }
 
-      _showSnackBar(errorMessage);
+      CustomSnackbar.showError(title: 'Login Gagal', message: errorMessage);
     } finally {
       setState(() {
         _isLoading = false;
@@ -90,27 +105,22 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        backgroundColor: message.contains('Selamat datang')
-            ? Colors.green[600]
-            : Colors.red[600],
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-        elevation: 6,
-        duration: Duration(seconds: message.contains('Selamat datang') ? 2 : 4),
-      ),
-    );
+  Future<void> _updateFCMToken(int userId, String token) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${Environment.baseUrl}/users/$userId/fcm-token'),
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: json.encode({'fcm_token': token}),
+      );
+
+      if (response.statusCode == 200) {
+        dev.log('FCM token updated successfully');
+      } else {
+        dev.log('Failed to update FCM token: ${response.body}');
+      }
+    } catch (e) {
+      dev.log('Error updating FCM token: $e');
+    }
   }
 
   @override
@@ -128,26 +138,15 @@ class _LoginPageState extends State<LoginPage> {
                   // Ikon gedung
                   Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.business,
-                      size: 80,
-                      color: Colors.white,
-                    ),
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                    child: const Icon(Icons.business, size: 80, color: Colors.white),
                   ),
                   const SizedBox(height: 32),
 
                   // Judul
                   const Text(
                     'BPS Cleaning System',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -167,11 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
+                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
                       ],
                     ),
                     child: Column(
@@ -208,22 +203,14 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: _isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF4CAF50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 2,
                             ),
                             child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
+                                ? const CircularProgressIndicator(color: Colors.white)
                                 : const Text(
                                     'Masuk',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                                   ),
                           ),
                         ),
@@ -232,12 +219,9 @@ class _LoginPageState extends State<LoginPage> {
                         // Forgot password link
                         TextButton(
                           onPressed: () {
-                            _showSnackBar('Fitur lupa password belum tersedia');
+                            CustomSnackbar.showInfo(title: 'Info', message: 'Fitur lupa password belum tersedia');
                           },
-                          child: const Text(
-                            'Lupa Password?',
-                            style: TextStyle(color: Color(0xFF2196F3)),
-                          ),
+                          child: const Text('Lupa Password?', style: TextStyle(color: Color(0xFF2196F3))),
                         ),
                       ],
                     ),

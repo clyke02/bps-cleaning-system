@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../../data/models/user.dart';
 import '../../../../../../data/repositories/user_repository.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class PetugasController extends GetxController {
   final UserRepository _userRepository = UserRepository();
@@ -34,11 +35,7 @@ class PetugasController extends GetxController {
       staffList.assignAll(users);
     } catch (e) {
       errorMessage.value = e.toString();
-      Get.snackbar(
-        'Error',
-        'Gagal memuat data petugas: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal memuat data petugas: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
@@ -55,30 +52,20 @@ class PetugasController extends GetxController {
     try {
       isSubmitting.value = true;
 
-      await _userRepository.createUser(
-        name: name,
-        username: username,
-        phone: phone,
-        password: password,
-        role: role,
-      );
+      await _userRepository.createUser(name: name, username: username, phone: phone, password: password, role: role);
 
-      Get.snackbar(
-        'Sukses',
-        '${role == 'admin' ? 'Admin' : 'Petugas'} berhasil ditambahkan!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
+      CustomSnackbar.showSuccess(
+        title: 'Sukses',
+        message: '${role == 'admin' ? 'Admin' : 'Petugas'} berhasil ditambahkan!',
       );
 
       // Reload data
       await loadUsers();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal menambahkan ${role == 'admin' ? 'admin' : 'petugas'}: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
+      CustomSnackbar.showError(
+        title: 'Error',
+        message: 'Gagal menambahkan ${role == 'admin' ? 'admin' : 'petugas'}: ${e.toString()}',
       );
       return false;
     } finally {
@@ -107,22 +94,18 @@ class PetugasController extends GetxController {
         role: role,
       );
 
-      Get.snackbar(
-        'Sukses',
-        '${role == 'admin' ? 'Admin' : 'Petugas'} berhasil diperbarui!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
+      CustomSnackbar.showSuccess(
+        title: 'Sukses',
+        message: '${role == 'admin' ? 'Admin' : 'Petugas'} berhasil diperbarui!',
       );
 
       // Reload data
       await loadUsers();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal memperbarui ${role == 'admin' ? 'admin' : 'petugas'}: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
+      CustomSnackbar.showError(
+        title: 'Error',
+        message: 'Gagal memperbarui ${role == 'admin' ? 'admin' : 'petugas'}: ${e.toString()}',
       );
       return false;
     } finally {
@@ -135,23 +118,13 @@ class PetugasController extends GetxController {
     try {
       await _userRepository.deleteUser(user.id);
 
-      Get.snackbar(
-        'Sukses',
-        '${user.displayRole} ${user.name} berhasil dihapus!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Get.theme.primaryColor,
-        colorText: Get.theme.colorScheme.onPrimary,
-      );
+      CustomSnackbar.showSuccess(title: 'Sukses', message: '${user.displayRole} ${user.name} berhasil dihapus!');
 
       // Reload data
       await loadUsers();
       return true;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal menghapus ${user.displayRole}: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      CustomSnackbar.showError(title: 'Error', message: 'Gagal menghapus ${user.displayRole}: ${e.toString()}');
       return false;
     }
   }
@@ -161,9 +134,7 @@ class PetugasController extends GetxController {
     Get.dialog(
       AlertDialog(
         title: const Text('Konfirmasi Hapus'),
-        content: Text(
-          'Apakah Anda yakin ingin menghapus ${user.displayRole} ${user.name}?',
-        ),
+        content: Text('Apakah Anda yakin ingin menghapus ${user.displayRole} ${user.name}?'),
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
           TextButton(
@@ -171,9 +142,7 @@ class PetugasController extends GetxController {
               Get.back();
               deleteUser(user);
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Get.theme.colorScheme.error,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Get.theme.colorScheme.error),
             child: const Text('Hapus'),
           ),
         ],
@@ -186,10 +155,6 @@ class PetugasController extends GetxController {
     final adminCount = staffList.where((user) => user.isAdmin).length;
     final userCount = staffList.where((user) => !user.isAdmin).length;
 
-    return {
-      'total_petugas': userCount,
-      'total_admin': adminCount,
-      'total_all': staffList.length,
-    };
+    return {'total_petugas': userCount, 'total_admin': adminCount, 'total_all': staffList.length};
   }
 }

@@ -212,10 +212,15 @@ class HomeController extends GetxController {
     return dailyAssignments.where((assignment) => assignment.isCompleted).length;
   }
 
-  // Mark assignment as completed when report is submitted
+  // Get rejected assignments count (includes both 'missed' and 'rejected' status)
+  int get rejectedAssignmentsCount {
+    return dailyAssignments.where((assignment) => assignment.isMissed || assignment.isRejected).length;
+  }
+
+  // Mark assignment as "In Review" when report is submitted (not completed yet)
   void markAssignmentCompleted(int areaId, int reportId) {
     final assignmentIndex = dailyAssignments.indexWhere(
-      (assignment) => assignment.areaId == areaId && assignment.isPending,
+      (assignment) => assignment.areaId == areaId && (assignment.isPending || assignment.isRejected),
     );
 
     if (assignmentIndex != -1) {
@@ -224,7 +229,7 @@ class HomeController extends GetxController {
         userId: dailyAssignments[assignmentIndex].userId,
         areaId: dailyAssignments[assignmentIndex].areaId,
         assignmentDate: dailyAssignments[assignmentIndex].assignmentDate,
-        status: 'completed',
+        status: 'pending', // Keep as pending (In Review) until admin approves
         reportId: reportId,
         notes: dailyAssignments[assignmentIndex].notes,
         createdAt: dailyAssignments[assignmentIndex].createdAt,

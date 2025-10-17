@@ -67,13 +67,17 @@ class DailyAssignment {
   bool get isPending => status == 'pending';
   bool get isCompleted => status == 'completed';
   bool get isMissed => status == 'missed';
+  bool get isRejected => status == 'rejected';
 
   String get statusText {
     switch (status) {
       case 'pending':
-        return 'Belum Lapor';
+        // Check if has report - if yes, it's "In Review", otherwise "Belum Lapor"
+        return reportId != null ? 'In Review' : 'Belum Lapor';
       case 'completed':
         return 'Disetujui';
+      case 'rejected':
+        return 'Ditolak';
       case 'missed':
         return 'Ditolak';
       default:
@@ -81,6 +85,6 @@ class DailyAssignment {
     }
   }
 
-  String get areaName => area?['name'] ?? 'Area ${areaId}';
+  String get areaName => area?['name'] ?? 'Area $areaId';
   String get areaDescription => area?['description'] ?? '';
 }

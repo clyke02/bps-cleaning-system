@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_styles.dart';
 import '../../../core/utils/auth_helper.dart';
+import '../../../shared/widgets/custom_snackbar.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -78,12 +79,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           Navigator.pushReplacementNamed(context, '/login');
 
           // Show message to user
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Akun Anda sudah tidak aktif. Silakan hubungi administrator.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 4),
-            ),
+          CustomSnackbar.showWarning(
+            title: 'Akun Tidak Aktif',
+            message: 'Akun Anda sudah tidak aktif. Silakan hubungi administrator.',
           );
         }
       }

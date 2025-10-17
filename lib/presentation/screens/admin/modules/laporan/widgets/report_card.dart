@@ -28,17 +28,8 @@ class ReportCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
-            spreadRadius: 2,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 15, offset: const Offset(0, 6), spreadRadius: 2),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2)),
         ],
         border: Border.all(color: Colors.grey.shade100, width: 1),
       ),
@@ -53,60 +44,38 @@ class ReportCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   report.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                 ),
               ),
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: _getStatusColor(report.status),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       report.status.displayName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: onDetailPressed,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Row(
                         children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 14,
-                            color: Colors.grey,
-                          ),
+                          Icon(Icons.info_outline, size: 14, color: Colors.grey),
                           SizedBox(width: 4),
                           Text(
                             'Detail',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -121,7 +90,7 @@ class ReportCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 12),
             child: Text(
-              '${report.petugas} • ${report.tanggal}',
+              '${report.petugas} • ${report.formattedDate}',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
             ),
           ),
@@ -160,48 +129,30 @@ class ReportCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (report.catatanPetugas != null &&
-                        report.catatanPetugas!.isNotEmpty) ...[
+                    if (report.catatanPetugas != null && report.catatanPetugas!.isNotEmpty) ...[
                       const Text(
                         'Catatan Petugas:',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         report.catatanPetugas!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade700,
-                          height: 1.3,
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.3),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
                     ],
 
-                    if (report.catatanAdmin != null &&
-                        report.catatanAdmin!.isNotEmpty) ...[
+                    if (report.catatanAdmin != null && report.catatanAdmin!.isNotEmpty) ...[
                       const Text(
                         'Catatan Admin:',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         report.catatanAdmin!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade700,
-                          height: 1.3,
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.3),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -222,19 +173,11 @@ class ReportCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onBeriCatatanPressed,
                   icon: const Icon(Icons.edit_note, size: 16),
-                  label: const Text(
-                    'Beri Catatan',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                  ),
+                  label: const Text('Beri Catatan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                     side: BorderSide(color: Colors.grey.shade300),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
               ),
@@ -246,40 +189,24 @@ class ReportCard extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onSetujuPressed,
                   icon: const Icon(Icons.check, size: 16),
-                  label: const Text(
-                    'Setujui',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
+                  label: const Text('Setujui', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4CAF50),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
                 const SizedBox(width: 6),
                 ElevatedButton.icon(
                   onPressed: onTolakPressed,
                   icon: const Icon(Icons.close, size: 16),
-                  label: const Text(
-                    'Tolak',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
+                  label: const Text('Tolak', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFEF5350),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
               ] else ...[
@@ -288,23 +215,12 @@ class ReportCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: onDownloadPressed,
                     icon: const Icon(Icons.download, size: 16),
-                    label: const Text(
-                      'Download Laporan',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    label: const Text('Download Laporan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4CAF50),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                 ),
@@ -320,26 +236,15 @@ class ReportCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.camera_alt_outlined,
-            size: 24,
-            color: Colors.grey.shade400,
-          ),
+          Icon(Icons.camera_alt_outlined, size: 24, color: Colors.grey.shade400),
           const SizedBox(height: 4),
           Text(
             'Foto bukti',
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey.shade500,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
           ),
         ],
       ),

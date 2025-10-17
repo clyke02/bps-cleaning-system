@@ -7,6 +7,7 @@ import '../../../../../../shared/widgets/ringkasan_widget.dart';
 import '../widgets/area_add_dialog.dart';
 import '../../../../../../core/constants/app_styles.dart';
 import '../../../../../../config/environment.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class AreaView extends StatelessWidget {
   final Map<String, int>? weeklySummary;
@@ -257,9 +258,7 @@ class AreaView extends StatelessWidget {
                         if (context.mounted) {
                           Navigator.pop(context);
                           if (success) {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(const SnackBar(content: Text('Area berhasil dihapus')));
+                            CustomSnackbar.showSuccess(title: 'Berhasil', message: 'Area berhasil dihapus');
                           }
                         }
                       },
@@ -391,9 +390,7 @@ class AreaView extends StatelessWidget {
         }
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'] ?? 'Gagal generate tugas'), backgroundColor: Colors.red),
-          );
+          CustomSnackbar.showError(title: 'Error', message: data['message'] ?? 'Gagal generate tugas');
         }
       }
     } catch (e) {
@@ -401,9 +398,7 @@ class AreaView extends StatelessWidget {
       if (context.mounted) Navigator.pop(context);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red));
+        CustomSnackbar.showError(title: 'Error', message: 'Error: ${e.toString()}');
       }
     }
   }

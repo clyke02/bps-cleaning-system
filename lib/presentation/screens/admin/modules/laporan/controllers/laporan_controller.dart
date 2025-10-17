@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../data/models/report_model.dart';
 import '../../../../../../config/environment.dart';
 import '../../../../../../services/pdf_service.dart';
+import '../../../../../../shared/widgets/custom_snackbar.dart';
 
 class LaporanController extends GetxController {
   // Reactive Variables
@@ -15,11 +16,7 @@ class LaporanController extends GetxController {
   final Rx<ReportStatus?> selectedFilter = Rx<ReportStatus?>(null);
 
   // Weekly Summary
-  final Rx<Map<String, int>> weeklySummary = Rx<Map<String, int>>({
-    'Selesai': 0,
-    'Menunggu': 0,
-    'Ditolak': 0,
-  });
+  final Rx<Map<String, int>> weeklySummary = Rx<Map<String, int>>({'Selesai': 0, 'Menunggu': 0, 'Ditolak': 0});
 
   // Filtered reports based on search and status
   List<Report> get filteredReports {
@@ -27,23 +24,15 @@ class LaporanController extends GetxController {
 
     // Filter by status
     if (selectedFilter.value != null) {
-      filtered = filtered
-          .where((report) => report.status == selectedFilter.value)
-          .toList();
+      filtered = filtered.where((report) => report.status == selectedFilter.value).toList();
     }
 
     // Filter by search query
     if (searchQuery.value.isNotEmpty) {
       filtered = filtered.where((report) {
-        return report.title.toLowerCase().contains(
-              searchQuery.value.toLowerCase(),
-            ) ||
-            report.petugas.toLowerCase().contains(
-              searchQuery.value.toLowerCase(),
-            ) ||
-            report.status.toString().toLowerCase().contains(
-              searchQuery.value.toLowerCase(),
-            );
+        return report.title.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+            report.petugas.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+            report.status.toString().toLowerCase().contains(searchQuery.value.toLowerCase());
       }).toList();
     }
 
@@ -89,14 +78,9 @@ class LaporanController extends GetxController {
               id: json['id'] ?? 0,
               title: json['title'] ?? 'Laporan',
               petugas: json['user']?['name'] ?? 'Unknown',
-              tanggal:
-                  json['submission_date'] ?? DateTime.now().toIso8601String(),
+              tanggal: json['submission_date'] ?? DateTime.now().toIso8601String(),
               status: _mapStatus(json['status']),
-              imagePaths:
-                  (json['photos'] as List?)
-                      ?.map((p) => p['photo_path'] as String)
-                      .toList() ??
-                  [],
+              imagePaths: (json['photos'] as List?)?.map((p) => p['photo_path'] as String).toList() ?? [],
               catatanPetugas: json['description'] ?? '',
               catatanAdmin: json['admin_notes'],
               areaId: json['area']?['id'] ?? 0,
@@ -130,15 +114,9 @@ class LaporanController extends GetxController {
 
   // Update weekly summary based on report list
   void _updateWeeklySummary() {
-    int selesai = reportList
-        .where((r) => r.status == ReportStatus.selesai)
-        .length;
-    int menunggu = reportList
-        .where((r) => r.status == ReportStatus.menunggu)
-        .length;
-    int ditolak = reportList
-        .where((r) => r.status == ReportStatus.ditolak)
-        .length;
+    final int selesai = reportList.where((r) => r.status == ReportStatus.selesai).length;
+    final int menunggu = reportList.where((r) => r.status == ReportStatus.menunggu).length;
+    final int ditolak = reportList.where((r) => r.status == ReportStatus.ditolak).length;
 
     weeklySummary.value = {
       'total': reportList.length,
@@ -206,10 +184,7 @@ class LaporanController extends GetxController {
       // For now using dummy admin id
       final response = await http.put(
         Uri.parse('${Environment.baseUrl}/cleaning-reports/$reportId/status'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         body: json.encode({
           'status': backendStatus,
           'reviewed_by': 1, // TODO: Replace with actual admin ID
@@ -237,10 +212,7 @@ class LaporanController extends GetxController {
   }
 
   // Update report status
-  Future<bool> updateReportStatus(
-    String reportId,
-    ReportStatus newStatus,
-  ) async {
+  Future<bool> updateReportStatus(String reportId, ReportStatus newStatus) async {
     try {
       isLoading.value = true;
 
@@ -261,10 +233,7 @@ class LaporanController extends GetxController {
       // For now using dummy admin id
       final response = await http.put(
         Uri.parse('${Environment.baseUrl}/cleaning-reports/$reportId/status'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         body: json.encode({
           'status': backendStatus,
           'reviewed_by': 1, // TODO: Replace with actual admin ID
@@ -296,13 +265,9 @@ class LaporanController extends GetxController {
       await Future.delayed(const Duration(milliseconds: 1000));
 
       // Find and update report with note
-      final reportIndex = reportList.indexWhere(
-        (report) => report.id == reportId,
-      );
+      final reportIndex = reportList.indexWhere((report) => report.id == reportId);
       if (reportIndex != -1) {
-        final updatedReport = reportList[reportIndex].copyWith(
-          catatanAdmin: note.isNotEmpty ? note : null,
-        );
+        final updatedReport = reportList[reportIndex].copyWith(catatanAdmin: note.isNotEmpty ? note : null);
         reportList[reportIndex] = updatedReport;
         return true;
       }
@@ -332,15 +297,9 @@ class LaporanController extends GetxController {
             children: [
               const Icon(Icons.picture_as_pdf, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              const Text(
-                'Export Laporan Mingguan',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              const Text('Export Laporan Mingguan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text(
-                'Pilih periode mingguan untuk export PDF',
-                style: TextStyle(color: Colors.grey),
-              ),
+              const Text('Pilih periode mingguan untuk export PDF', style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 24),
 
               // Year Selector
@@ -348,10 +307,7 @@ class LaporanController extends GetxController {
                 children: [
                   const Expanded(
                     flex: 2,
-                    child: Text(
-                      'Tahun:',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    child: Text('Tahun:', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                   Expanded(
                     flex: 3,
@@ -359,22 +315,13 @@ class LaporanController extends GetxController {
                       () => DropdownButtonFormField<int>(
                         value: selectedYear.value,
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
-                        items: List.generate(5, (index) => now.year - 2 + index)
-                            .map(
-                              (year) => DropdownMenuItem(
-                                value: year,
-                                child: Text(year.toString()),
-                              ),
-                            )
-                            .toList(),
+                        items: List.generate(
+                          5,
+                          (index) => now.year - 2 + index,
+                        ).map((year) => DropdownMenuItem(value: year, child: Text(year.toString()))).toList(),
                         onChanged: (value) => selectedYear.value = value!,
                       ),
                     ),
@@ -389,10 +336,7 @@ class LaporanController extends GetxController {
                 children: [
                   const Expanded(
                     flex: 2,
-                    child: Text(
-                      'Bulan:',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    child: Text('Bulan:', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                   Expanded(
                     flex: 3,
@@ -400,13 +344,8 @@ class LaporanController extends GetxController {
                       () => DropdownButtonFormField<int>(
                         value: selectedMonth.value,
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                         items: const [
                           DropdownMenuItem(value: 1, child: Text('Januari')),
@@ -436,10 +375,7 @@ class LaporanController extends GetxController {
                 children: [
                   const Expanded(
                     flex: 2,
-                    child: Text(
-                      'Minggu:',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    child: Text('Minggu:', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                   Expanded(
                     flex: 3,
@@ -447,31 +383,14 @@ class LaporanController extends GetxController {
                       () => DropdownButtonFormField<int>(
                         value: selectedWeek.value,
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                         ),
                         items: const [
-                          DropdownMenuItem(
-                            value: 1,
-                            child: Text('Minggu ke-1'),
-                          ),
-                          DropdownMenuItem(
-                            value: 2,
-                            child: Text('Minggu ke-2'),
-                          ),
-                          DropdownMenuItem(
-                            value: 3,
-                            child: Text('Minggu ke-3'),
-                          ),
-                          DropdownMenuItem(
-                            value: 4,
-                            child: Text('Minggu ke-4'),
-                          ),
+                          DropdownMenuItem(value: 1, child: Text('Minggu ke-1')),
+                          DropdownMenuItem(value: 2, child: Text('Minggu ke-2')),
+                          DropdownMenuItem(value: 3, child: Text('Minggu ke-3')),
+                          DropdownMenuItem(value: 4, child: Text('Minggu ke-4')),
                         ],
                         onChanged: (value) => selectedWeek.value = value!,
                       ),
@@ -485,10 +404,7 @@ class LaporanController extends GetxController {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(Get.context!),
-                      child: const Text('Batal'),
-                    ),
+                    child: OutlinedButton(onPressed: () => Navigator.pop(Get.context!), child: const Text('Batal')),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -501,10 +417,7 @@ class LaporanController extends GetxController {
                           week: selectedWeek.value,
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
                       child: const Text('Export PDF'),
                     ),
                   ),
@@ -518,23 +431,14 @@ class LaporanController extends GetxController {
     );
   }
 
-  Future<void> exportWeeklyPDF({
-    required int year,
-    required int month,
-    required int week,
-  }) async {
+  Future<void> exportWeeklyPDF({required int year, required int month, required int week}) async {
     try {
       isLoading.value = true;
 
       // Fetch weekly report data from API
       final response = await http.get(
-        Uri.parse(
-          '${Environment.baseUrl}/weekly-report-data?year=$year&month=$month&week=$week',
-        ),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        Uri.parse('${Environment.baseUrl}/weekly-report-data?year=$year&month=$month&week=$week'),
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
       );
 
       if (response.statusCode == 200) {
@@ -544,9 +448,7 @@ class LaporanController extends GetxController {
           final weeklyData = responseData['data'];
 
           // Generate PDF
-          final pdf = await PDFService.generateWeeklyReportPDF(
-            weeklyData: weeklyData,
-          );
+          final pdf = await PDFService.generateWeeklyReportPDF(weeklyData: weeklyData);
 
           // Generate filename
           final monthNames = [
@@ -563,34 +465,18 @@ class LaporanController extends GetxController {
             'November',
             'Desember',
           ];
-          final filename =
-              'Laporan_Mingguan_${monthNames[month - 1]}_Minggu${week}_$year';
+          final filename = 'Laporan_Mingguan_${monthNames[month - 1]}_Minggu${week}_$year';
 
           // Show export options
           _showExportOptions(pdf, filename);
         } else {
-          Get.snackbar(
-            'Error',
-            responseData['message'] ?? 'Gagal mengambil data mingguan',
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
+          CustomSnackbar.showError(title: 'Error', message: responseData['message'] ?? 'Gagal mengambil data mingguan');
         }
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal mengambil data dari server',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        CustomSnackbar.showError(title: 'Error', message: 'Gagal mengambil data dari server');
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Terjadi kesalahan: ${e.toString()}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      CustomSnackbar.showError(title: 'Error', message: 'Terjadi kesalahan: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
@@ -606,10 +492,7 @@ class LaporanController extends GetxController {
             children: [
               const Icon(Icons.picture_as_pdf, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              const Text(
-                'Export PDF',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              const Text('Export PDF', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 24),
 
               _buildExportOption(
@@ -632,10 +515,7 @@ class LaporanController extends GetxController {
                 },
               ),
               const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Navigator.pop(Get.context!),
-                child: const Text('Batal'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(Get.context!), child: const Text('Batal')),
             ],
           ),
         ),

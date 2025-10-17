@@ -10,11 +10,16 @@ class CleaningTaskDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CleaningTaskController());
+    // Use Get.find() to reuse existing controller or create new one with tag
+    final controller = Get.isRegistered<CleaningTaskController>(tag: 'dialog_${area.id}')
+        ? Get.find<CleaningTaskController>(tag: 'dialog_${area.id}')
+        : Get.put(CleaningTaskController(), tag: 'dialog_${area.id}');
 
-    // Set selected area when dialog opens
+    // Set selected area when dialog opens (only once)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.setSelectedArea(area);
+      if (controller.selectedArea.value?.id != area.id) {
+        controller.setSelectedArea(area);
+      }
     });
 
     return Dialog(
@@ -47,6 +52,8 @@ class CleaningTaskDialog extends StatelessWidget {
                     onPressed: () {
                       controller.clearForm();
                       Get.back();
+                      // Delete controller setelah dialog ditutup
+                      Get.delete<CleaningTaskController>(tag: 'dialog_${area.id}');
                     },
                     icon: const Icon(
                       Icons.close,
@@ -416,8 +423,12 @@ class CleaningTaskDialog extends StatelessWidget {
         child: ElevatedButton(
           onPressed: controller.isLoading.value
               ? null
-              : () {
-                  controller.submitCleaningReport();
+              : () async {
+                  await controller.submitCleaningReport();
+                  // Delete controller setelah submit (jika dialog sudah tertutup)
+                  if (!Get.isOverlaysOpen) {
+                    Get.delete<CleaningTaskController>(tag: 'dialog_${area.id}');
+                  }
                 },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black,
