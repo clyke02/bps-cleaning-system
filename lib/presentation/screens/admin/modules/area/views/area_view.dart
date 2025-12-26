@@ -351,17 +351,6 @@ class AreaView extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Sudah ada:'),
-                                Text(
-                                  '$skipped',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                       ),

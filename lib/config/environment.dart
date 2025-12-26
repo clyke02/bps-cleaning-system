@@ -8,7 +8,7 @@ class Environment {
   // Mode yang tersedia:
   // - 'development' : Testing di local (emulator/device fisik)
   // - 'production'  : Deploy ke server production (BPS)
-  static const String mode = 'development'; // ⚠️ UBAH KE 'production' SAAT DEPLOY!
+  static const String mode = 'production'; // ⚠️ UBAH KE 'production' SAAT DEPLOY!
 
   // ================================
   // 🌐 PRODUCTION SERVER (UNTUK DEPLOYMENT)
@@ -19,7 +19,7 @@ class Environment {
   // - 'http://192.168.1.100:8000/api'  (IP server lokal BPS)
   // - 'http://bps.go.id/cleaning-api'  (Domain production)
   // - 'https://api.bps-cleaning.com'   (Domain dengan SSL)
-  static const String productionUrl = 'http://SERVER_IP_ANDA:8000/api'; // ⚠️ GANTI SEBELUM DEPLOY!
+  static const String productionUrl = 'https://kobe-unimitable-vickey.ngrok-free.dev/api'; // ⚠️ GANTI SEBELUM DEPLOY!
 
   // ================================
   // 🔧 DEVELOPMENT CONFIG (UNTUK TESTING)
@@ -48,15 +48,20 @@ class Environment {
     if (mode == 'production') {
       return productionUrl;
     }
-
-    // Jika development
-    if (Platform.isAndroid) {
-      return useEmulator ? emulatorUrl : deviceUrl;
-    } else if (Platform.isIOS) {
-      return 'http://127.0.0.1:8000/api';
+    if (useEmulator) {
+      return 'http://10.0.2.2:8000/api';
     } else {
-      return 'http://127.0.0.1:8000/api';
+      return 'http://$localNetworkIP:8000/api';
     }
+
+    // // Jika development
+    // if (Platform.isAndroid) {
+    //   return useEmulator ? emulatorUrl : deviceUrl;
+    // } else if (Platform.isIOS) {
+    //   return 'http://127.0.0.1:8000/api';
+    // } else {
+    //   return 'http://127.0.0.1:8000/api';
+    // }
   }
 
   // ================================

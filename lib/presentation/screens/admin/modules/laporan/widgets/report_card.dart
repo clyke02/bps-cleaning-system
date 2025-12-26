@@ -168,58 +168,62 @@ class ReportCard extends StatelessWidget {
           // Action buttons
           Row(
             children: [
-              // Beri Catatan button (selalu ada)
               Expanded(
-                child: OutlinedButton.icon(
+                child: ElevatedButton.icon(
                   onPressed: onBeriCatatanPressed,
                   icon: const Icon(Icons.edit_note, size: 16),
-                  label: const Text('Beri Catatan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    side: BorderSide(color: Colors.grey.shade300),
+                  label: const Text('Catatan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.green,
+                    side: const BorderSide(color: Colors.green),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
               ),
-
               const SizedBox(width: 8),
-
-              // Action buttons sesuai status
               if (report.status == ReportStatus.menunggu) ...[
-                ElevatedButton.icon(
-                  onPressed: onSetujuPressed,
-                  icon: const Icon(Icons.check, size: 16),
-                  label: const Text('Setujui', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onSetujuPressed,
+                    icon: const Icon(Icons.check, size: 16),
+                    label: const Text('Setujui', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(0, 42),
+                      backgroundColor: const Color(0xFF4CAF50),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 6),
-                ElevatedButton.icon(
-                  onPressed: onTolakPressed,
-                  icon: const Icon(Icons.close, size: 16),
-                  label: const Text('Tolak', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFEF5350),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onTolakPressed,
+                    icon: const Icon(Icons.close, size: 16),
+                    label: const Text('Tolak', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(0, 42),
+                      backgroundColor: const Color(0xFFEF5350),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
                   ),
                 ),
               ] else ...[
-                // Download Laporan button untuk status selesai
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onDownloadPressed,
                     icon: const Icon(Icons.download, size: 16),
                     label: const Text('Download Laporan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(0, 42),
                       backgroundColor: const Color(0xFF4CAF50),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
