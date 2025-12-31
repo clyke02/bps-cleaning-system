@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_styles.dart';
 import '../../../core/utils/auth_helper.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
+import '../../../services/fcm_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -51,7 +52,21 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _navigateToNextScreen() async {
-    await Future.delayed(const Duration(milliseconds: 3000));
+    // Wait for splash animation to complete (2 seconds)
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (!mounted) return;
+
+    // Request notification permission after splash screen is visible
+    try {
+      await FCMService.requestNotificationPermission();
+    } catch (e) {
+      // Continue even if permission request fails
+      debugPrint('Permission request failed: $e');
+    }
+
+    // Small delay after permission dialog
+    await Future.delayed(const Duration(milliseconds: 500));
 
     if (!mounted) return;
 
