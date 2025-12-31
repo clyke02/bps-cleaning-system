@@ -15,26 +15,56 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class FCMService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
-  // Initialize FCM
-  static Future<void> initialize() async {
+  // Initialize FCM without requesting permission (called in main.dart)
+  static Future<void> initializeWithoutPermission() async {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-    // Request permission (Android 13+)
-    final NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      announcement: true,
-      criticalAlert: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      dev.log('FCM: User granted permission');
-    }
 
     // Register background handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+    // Setup message handlers (will be called after permission granted)
+    _setupMessageHandlers();
+  }
+
+  // Request notification permission (called in splash screen)
+  static Future<bool> requestNotificationPermission() async {
+    try {
+      // Check current permission status
+      final NotificationSettings currentSettings = await _messaging.getNotificationSettings();
+
+      // If already authorized, skip request
+      if (currentSettings.authorizationStatus == AuthorizationStatus.authorized) {
+        dev.log('✅ Notification permission already granted');
+        return true;
+      }
+
+      // Request permission
+      final NotificationSettings settings = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        announcement: false,
+        criticalAlert: false,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        dev.log('✅ User granted notification permission');
+        return true;
+      } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+        dev.log('⚠️ User granted provisional notification permission');
+        return true;
+      } else {
+        dev.log('❌ User declined notification permission');
+        return false;
+      }
+    } catch (e) {
+      dev.log('❌ Error requesting notification permission: $e');
+      return false;
+    }
+  }
+
+  // Setup message handlers for foreground and background notifications
+  static void _setupMessageHandlers() {
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       dev.log('Foreground message: ${message.notification?.title}');
@@ -47,17 +77,18 @@ class FCMService {
       }
     });
 
-    // Handle notification tap (app opened from terminated state)
+    // Handle notification tap (app opened from background)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       dev.log('Message tapped: ${message.data}');
       _handleNotificationTap(message.data);
     });
 
     // Check if app was opened from notification (terminated state)
-    final RemoteMessage? initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      _handleNotificationTap(initialMessage.data);
-    }
+    _messaging.getInitialMessage().then((RemoteMessage? initialMessage) {
+      if (initialMessage != null) {
+        _handleNotificationTap(initialMessage.data);
+      }
+    });
   }
 
   // Get FCM token

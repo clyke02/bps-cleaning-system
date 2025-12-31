@@ -14,9 +14,9 @@ import 'services/fcm_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize FCM
+  // Initialize FCM (without permission request - will be done in splash screen)
   try {
-    await FCMService.initialize();
+    await FCMService.initializeWithoutPermission();
   } catch (e) {
     debugPrint('FCM initialization failed: $e');
     // Continue app execution even if FCM fails
