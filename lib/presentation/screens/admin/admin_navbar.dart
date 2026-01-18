@@ -8,9 +8,11 @@ class AdminNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+
     return Container(
-      height: 65,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      height: 65 + bottomPadding,
+      padding: EdgeInsets.only(left: 12, right: 12, bottom: bottomPadding),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
